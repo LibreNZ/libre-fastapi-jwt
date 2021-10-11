@@ -1,5 +1,6 @@
 import jwt, re, uuid, hmac
 from jwt.algorithms import requires_cryptography, has_crypto
+from jwt.exceptions import ExpiredSignatureError
 from datetime import datetime, timezone, timedelta
 from typing import Optional, Dict, Union, Sequence
 from fastapi import Request, Response, WebSocket
@@ -665,6 +666,8 @@ class AuthJWT(AuthConfig):
                 leeway=self._decode_leeway,
                 algorithms=algorithms
             )
+        except ExpiredSignatureError as err:
+            raise JWTDecodeError(status_code=401,message=str(err))
         except Exception as err:
             raise JWTDecodeError(status_code=422,message=str(err))
 
