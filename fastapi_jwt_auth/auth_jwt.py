@@ -1,20 +1,22 @@
-import jwt, re, uuid, hmac
-from jwt.algorithms import requires_cryptography, has_crypto
-from jwt.exceptions import ExpiredSignatureError
-from datetime import datetime, timezone, timedelta
-from typing import Optional, Dict, Union, Sequence
+import hmac
+import re
+import uuid
+from datetime import datetime, timedelta, timezone
+from typing import Dict, Optional, Sequence, Union
+
+import jwt
 from fastapi import Request, Response, WebSocket
+from jwt.algorithms import has_crypto, requires_cryptography
+from jwt.exceptions import ExpiredSignatureError
+
 from fastapi_jwt_auth.auth_config import AuthConfig
-from fastapi_jwt_auth.exceptions import (
-    InvalidHeaderError,
-    CSRFError,
-    JWTDecodeError,
-    RevokedTokenError,
-    MissingTokenError,
-    AccessTokenRequired,
-    RefreshTokenRequired,
-    FreshTokenRequired
-)
+from fastapi_jwt_auth.exceptions import (AccessTokenRequired, CSRFError,
+                                         FreshTokenRequired,
+                                         InvalidHeaderError, JWTDecodeError,
+                                         MissingTokenError,
+                                         RefreshTokenRequired,
+                                         RevokedTokenError)
+
 
 class AuthJWT(AuthConfig):
     def __init__(self,req: Request = None, res: Response = None):
@@ -164,7 +166,7 @@ class AuthJWT(AuthConfig):
             "jti": self._get_jwt_identifier()
         }
 
-        custom_claims = {"type": type_token}
+        custom_claims = {"type_token": type_token}
 
         # for access_token only fresh needed
         if type_token == 'access':
