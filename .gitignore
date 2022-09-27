@@ -34,3 +34,5 @@ htmlcov/
 
 # testing py
 test.py
+
+.DS_STORE
