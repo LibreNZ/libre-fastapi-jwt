@@ -78,3 +78,12 @@ class ExpiredSignatureError(AuthJWTException):
     def __init__(self,status_code: int, message: str):
         self.status_code = status_code
         self.message = message
+
+class NotEnoughPermissions(AuthJWTException):
+    """
+    Error raised when a valid JWT attempt to access an endpoint
+    protected by scope requirements
+    """
+    def __init__(self,status_code: int, message: str):
+        self.status_code = status_code
+        self.message = message

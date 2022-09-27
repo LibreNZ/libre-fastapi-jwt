@@ -14,6 +14,7 @@ from fastapi_jwt_auth.exceptions import (AccessTokenRequired, CSRFError,
                                          FreshTokenRequired,
                                          InvalidHeaderError, JWTDecodeError,
                                          MissingTokenError,
+                                         NotEnoughPermissions,
                                          RefreshTokenRequired,
                                          RevokedTokenError)
 
@@ -27,6 +28,8 @@ class AuthJWT(AuthConfig):
         :param req: all incoming request
         :param res: response from endpoint
         """
+        self._required_roles = []
+
         if res and self.jwt_in_cookies:
             self._response = res
 
@@ -637,6 +640,8 @@ class AuthJWT(AuthConfig):
         raw_token = self._verified_token(encoded_token,issuer)
         if raw_token['type_token'] in self._denylist_token_checks:
             self._check_token_is_revoked(raw_token)
+        
+        self._verifying_roles(raw_token)
 
     def _verified_token(self,encoded_token: str, issuer: Optional[str] = None) -> Dict[str,Union[str,int,bool]]:
         """
@@ -673,12 +678,22 @@ class AuthJWT(AuthConfig):
         except Exception as err:
             raise JWTDecodeError(status_code=422,message=str(err))
 
+    def _verifying_roles(self, raw_token: dict) -> None:
+        #decoded_token = self.get_raw_jwt(encoded_token=token)
+        token_roles = raw_token["roles"] or []
+
+        if len(self._required_roles)>0:
+            for role in self._required_roles:
+                if role not in token_roles:
+                    raise NotEnoughPermissions(status_code=401, message="Not enough permissions")
+
     def jwt_required(
         self,
         auth_from: str = "request",
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
+        roles: list=[]
     ) -> None:
         """
         Only access token can access this function
@@ -690,6 +705,8 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_roles = roles
+
         if auth_from == "websocket":
             if websocket: self._verify_and_get_jwt_in_cookies('access',websocket,csrf_token)
             else: self._verify_jwt_in_request(token,'access','websocket')
@@ -712,6 +729,7 @@ class AuthJWT(AuthConfig):
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
+        roles: list=[]
     ) -> None:
         """
         If an access token in present in the request you can get data from get_raw_jwt() or get_jwt_subject(),
@@ -725,6 +743,8 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_roles = roles
+
         if auth_from == "websocket":
             if websocket: self._verify_and_get_jwt_optional_in_cookies(websocket,csrf_token)
             else: self._verify_jwt_optional_in_request(token)
@@ -747,6 +767,7 @@ class AuthJWT(AuthConfig):
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
+        roles: list=[]
     ) -> None:
         """
         This function will ensure that the requester has a valid refresh token
@@ -758,6 +779,8 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_roles = roles
+
         if auth_from == "websocket":
             if websocket: self._verify_and_get_jwt_in_cookies('refresh',websocket,csrf_token)
             else: self._verify_jwt_in_request(token,'refresh','websocket')
@@ -780,6 +803,7 @@ class AuthJWT(AuthConfig):
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
+        roles: list=[]
     ) -> None:
         """
         This function will ensure that the requester has a valid access token and fresh token
@@ -791,6 +815,8 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_roles = roles
+
         if auth_from == "websocket":
             if websocket: self._verify_and_get_jwt_in_cookies('access',websocket,csrf_token,True)
             else: self._verify_jwt_in_request(token,'access','websocket',True)
