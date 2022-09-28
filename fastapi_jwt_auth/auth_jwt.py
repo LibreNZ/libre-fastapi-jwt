@@ -691,8 +691,9 @@ class AuthJWT(AuthConfig):
     
     def _verifying_claims(self, raw_token: dict) -> None:
         if len(self._required_claims) > 0:
-            if set(self._required_claims) not in set(raw_token):
-                raise ClaimsRequired(status_code=401, message="Missing mandatory claims")
+            for claim in self._required_claims:
+                if claim not in raw_token or raw_token[claim] is None:
+                    raise ClaimsRequired(status_code=401, message="Missing mandatory claims")
 
 
     def jwt_required(
