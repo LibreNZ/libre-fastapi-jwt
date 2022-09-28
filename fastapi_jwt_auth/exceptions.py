@@ -87,3 +87,13 @@ class NotEnoughPermissions(AuthJWTException):
     def __init__(self,status_code: int, message: str):
         self.status_code = status_code
         self.message = message
+
+
+class ClaimsRequired(AuthJWTException):
+    """
+    Error raised when a valid JWT attempt to acces and endpoint
+    that needs mandatory claims
+    """
+    def __init__(self,status_code: int, message: str):
+        self.status_code = status_code
+        self.message = message

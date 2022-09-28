@@ -10,8 +10,8 @@ from jwt.algorithms import has_crypto, requires_cryptography
 from jwt.exceptions import ExpiredSignatureError
 
 from fastapi_jwt_auth.auth_config import AuthConfig
-from fastapi_jwt_auth.exceptions import (AccessTokenRequired, CSRFError,
-                                         FreshTokenRequired,
+from fastapi_jwt_auth.exceptions import (AccessTokenRequired, ClaimsRequired,
+                                         CSRFError, FreshTokenRequired,
                                          InvalidHeaderError, JWTDecodeError,
                                          MissingTokenError,
                                          NotEnoughPermissions,
@@ -28,6 +28,7 @@ class AuthJWT(AuthConfig):
         :param req: all incoming request
         :param res: response from endpoint
         """
+        self._required_claims = []
         self._required_roles = []
 
         if res and self.jwt_in_cookies:
@@ -640,7 +641,8 @@ class AuthJWT(AuthConfig):
         raw_token = self._verified_token(encoded_token,issuer)
         if raw_token['type_token'] in self._denylist_token_checks:
             self._check_token_is_revoked(raw_token)
-        
+
+        self._verifying_claims(raw_token)
         self._verifying_roles(raw_token)
 
     def _verified_token(self,encoded_token: str, issuer: Optional[str] = None) -> Dict[str,Union[str,int,bool]]:
@@ -686,6 +688,11 @@ class AuthJWT(AuthConfig):
             for role in self._required_roles:
                 if role not in token_roles:
                     raise NotEnoughPermissions(status_code=401, message="Not enough permissions")
+    
+    def _verifying_claims(self, raw_token: dict) -> None:
+        if set(self._required_claims) not in set(raw_token):
+            raise ClaimsRequired(status_code=401, message="Missing mandatory claims")
+
 
     def jwt_required(
         self,
@@ -693,7 +700,8 @@ class AuthJWT(AuthConfig):
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
-        roles: list=[]
+        roles: list=[],
+        claims: list=[]
     ) -> None:
         """
         Only access token can access this function
@@ -705,6 +713,7 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_claims = claims
         self._required_roles = roles
 
         if auth_from == "websocket":
@@ -729,7 +738,8 @@ class AuthJWT(AuthConfig):
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
-        roles: list=[]
+        roles: list=[],
+        claims: list=[]
     ) -> None:
         """
         If an access token in present in the request you can get data from get_raw_jwt() or get_jwt_subject(),
@@ -743,6 +753,7 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_claims = claims
         self._required_roles = roles
 
         if auth_from == "websocket":
@@ -767,7 +778,8 @@ class AuthJWT(AuthConfig):
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
-        roles: list=[]
+        roles: list=[],
+        claims: list=[]
     ) -> None:
         """
         This function will ensure that the requester has a valid refresh token
@@ -779,6 +791,7 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_claims = claims
         self._required_roles = roles
 
         if auth_from == "websocket":
@@ -803,7 +816,8 @@ class AuthJWT(AuthConfig):
         token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
-        roles: list=[]
+        roles: list=[],
+        claims: list=[]
     ) -> None:
         """
         This function will ensure that the requester has a valid access token and fresh token
@@ -815,6 +829,7 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
                            its must be passing csrf_token manually and can achieve by Query Url or Path
         """
+        self._required_claims = claims
         self._required_roles = roles
 
         if auth_from == "websocket":
