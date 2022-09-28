@@ -690,8 +690,9 @@ class AuthJWT(AuthConfig):
                     raise NotEnoughPermissions(status_code=401, message="Not enough permissions")
     
     def _verifying_claims(self, raw_token: dict) -> None:
-        if set(self._required_claims) not in set(raw_token):
-            raise ClaimsRequired(status_code=401, message="Missing mandatory claims")
+        if len(self._required_claims) > 0:
+            if set(self._required_claims) not in set(raw_token):
+                raise ClaimsRequired(status_code=401, message="Missing mandatory claims")
 
 
     def jwt_required(
