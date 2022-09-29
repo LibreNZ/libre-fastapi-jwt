@@ -693,7 +693,7 @@ class AuthJWT(AuthConfig):
         if len(self._required_claims) > 0:
             for claim in self._required_claims:
                 if claim not in raw_token or raw_token[claim] is None:
-                    raise ClaimsRequired(status_code=401, message="Missing mandatory claims")
+                    raise ClaimsRequired(status_code=422, message="Missing claim: team")
 
 
     def jwt_required(
