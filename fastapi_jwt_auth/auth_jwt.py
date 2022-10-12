@@ -682,7 +682,10 @@ class AuthJWT(AuthConfig):
 
     def _verifying_roles(self, raw_token: dict) -> None:
         #decoded_token = self.get_raw_jwt(encoded_token=token)
-        token_roles = raw_token["roles"] or []
+        if "roles" in raw_token:
+            token_roles = raw_token["roles"] or []
+        else:
+            token_roles = []
 
         if len(self._required_roles)>0:
             for role in self._required_roles:
