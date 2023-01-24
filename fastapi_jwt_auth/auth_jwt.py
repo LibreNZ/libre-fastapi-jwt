@@ -688,9 +688,8 @@ class AuthJWT(AuthConfig):
             token_roles = []
 
         if len(self._required_roles)>0:
-            for role in self._required_roles:
-                if role not in token_roles:
-                    raise NotEnoughPermissions(status_code=403, message="Not enough permissions")
+            if not any(x in self._required_roles for x in token_roles):
+                raise NotEnoughPermissions(status_code=403, message="Not enough permissions")
     
     def _verifying_claims(self, raw_token: dict) -> None:
         if len(self._required_claims) > 0:
