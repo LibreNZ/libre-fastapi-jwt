@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "fastapi-jwt-auth"
-version="0.5.0"
+version="0.5.1"
 authors = ["Nyoman Pradipta Dewantara <nyomanpradipta120@gmail.com>"]
 description = "FastAPI JWT Auth"
 homepage = "https://github.com/IndominusByte/fastapi-jwt-auth"
