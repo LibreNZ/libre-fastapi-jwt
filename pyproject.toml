@@ -1,14 +1,14 @@
 [build-system]
-requires = ["flit_core>=2,<4"]
-build-backend = "flit_core.buildapi"
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
 
-[tool.flit.metadata]
-module = "fastapi_jwt_auth"
-dist-name = "fastapi-jwt-auth"
-author = "Nyoman Pradipta Dewantara"
-author-email = "nyomanpradipta120@gmail.com"
-home-page = "https://github.com/IndominusByte/fastapi-jwt-auth"
-
+[tool.poetry]
+name = "fastapi-jwt-auth"
+version="0.5.0"
+authors = ["Nyoman Pradipta Dewantara <nyomanpradipta120@gmail.com>"]
+description = "FastAPI JWT Auth"
+homepage = "https://github.com/IndominusByte/fastapi-jwt-auth"
+repository = "https://github.com/IndominusByte/fastapi-jwt-auth"
 classifiers = [
   "Environment :: Web Environment",
   "Intended Audience :: Developers",
@@ -21,34 +21,20 @@ classifiers = [
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
   "Topic :: Software Development :: Libraries :: Python Modules"
 ]
+readme = "README.md"
 
-requires = [
-  "fastapi>=0.61.0",
-  "PyJWT>=1.7.1,<2.0.0"
-]
+[tool.poetry.dependencies]
+python = "^3.7"
+pyjwt = {extras = ["crypto"], version = "^2.6.0"}
+fastapi = "^0.95.1"
+pytest = "^7.3.1"
+mkdocs = "^1.4.2"
 
-description-file = "README.md"
-requires-python = ">=3.6"
+[tool.poetry.group.test.dependencies]
+pytest = "^7.3.1"
 
-[tool.flit.metadata.urls]
-Documentation = "https://indominusbyte.github.io/fastapi-jwt-auth/"
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.4.2"
 
-[tool.flit.metadata.requires-extra]
-test = [
-  "pytest==6.0.1",
-  "pytest-cov==2.10.0",
-  "coveralls==2.1.2"
-]
-
-doc = [
-  "mkdocs>=1.1.2,<2.0.0",
-  "mkdocs-material>=5.5.0,<6.0.0",
-  "markdown-include>=0.5.1,<0.6.0"
-]
-
-dev = [
-  "cryptography>=2.6,<4.0.0",
-  "uvicorn>=0.11.5,<0.12.0"
-]
-
-asymmetric = ["cryptography>=2.6,<4.0.0"]
+[tool.poetry.group.dev.dependencies]
+uvicorn = "^0.22.0"
