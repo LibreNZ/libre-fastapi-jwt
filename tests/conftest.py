@@ -2,6 +2,7 @@ import pytest
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.config import LoadConfig
 
+
 @pytest.fixture(scope="module")
 def Authorize():
     return AuthJWT()
