@@ -116,7 +116,7 @@ class AuthJWT(AuthConfig):
 
         if algorithm in asymmetric_algorithms and not has_crypto:
             raise RuntimeError(
-                "Missing dependencies for using asymmetric algorithms. run 'pip install fastapi-jwt-auth[asymmetric]'"
+                "Missing dependencies for using asymmetric algorithms. run 'pip install fastapi-another-jwt-auth[asymmetric]'"
             )
 
         if process == "encode":
@@ -171,6 +171,8 @@ class AuthJWT(AuthConfig):
             raise TypeError("audience must be a string or sequence")
         if algorithm and not isinstance(algorithm, str):
             raise TypeError("algorithm must be a string")
+        if headers and not isinstance(headers, dict):
+            raise TypeError("headers must be a dict")            
         if user_claims and not isinstance(user_claims, dict):
             raise TypeError("user_claims must be a dictionary")
 
@@ -220,7 +222,7 @@ class AuthJWT(AuthConfig):
             secret_key,
             algorithm=algorithm,
             headers=headers
-        ).decode('utf-8')
+        )
 
     def _has_token_in_denylist_callback(self) -> bool:
         """

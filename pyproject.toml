@@ -21,7 +21,6 @@ requires-python = ">=3.8"
 dynamic = ["version", "description"]
 dependencies = ["fastapi>=0.95.1", "PyJWT>=2.6.0"]
 
-
 [project.urls]
 Documentation = "https://LibreNZ.github.io/fastapi-jwt-auth/"
 Source = "https://github.com/LibreNZ/fastapi-jwt-auth"
@@ -34,4 +33,5 @@ doc = [
   "markdown-include>=0.5.1,<0.6.0",
 ]
 dev = ["cryptography==37.0.3", "uvicorn==0.17.6"]
-asymmetric = ["cryptography==37.0.3"]
+asymmetric = ["cryptography>=37.0.3,<41.0.0"]
+

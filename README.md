@@ -1,5 +1,5 @@
 <h1 align="left" style="margin-bottom: 20px; font-weight: 500; font-size: 50px; color: black;">
-  FastAPI JWT Auth
+  FastAPI Another JWT Auth
 </h1>
 
 ![Tests](https://github.com/LibreNZ/fastapi-jwt-auth/workflows/Tests/badge.svg)
@@ -8,6 +8,7 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/fastapi-jwt-auth?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/fastapi-jwt-auth)
 
 ---
+<h2> The project is based on <a href="https://pypi.org/project/fastapi-jwt-auth/" target="_blank">Fastapi-jwt-auth</a> that is no longer maintained. </h2> 
 
 **Documentation**: <a href="https://LibreNZ.github.io/fastapi-jwt-auth" target="_blank">https://LibreNZ.github.io/fastapi-jwt-auth</a>
 
@@ -29,12 +30,12 @@ FastAPI extension that provides JWT Auth support (secure, easy to use and lightw
 The easiest way to start working with this extension with pip
 
 ```bash
-pip install fastapi-jwt-auth
+pip install fastapi-another-jwt-auth
 ```
 
 If you want to use asymmetric (public/private) key signing algorithms, include the <b>asymmetric</b> extra requirements.
 ```bash
-pip install 'fastapi-jwt-auth[asymmetric]'
+pip install 'fastapi-another-jwt-auth[asymmetric]'
 ```
 
 ## License
