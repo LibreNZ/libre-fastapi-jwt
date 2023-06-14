@@ -29,6 +29,7 @@ python = "^3.8"
 PyJWT = "^2.6.0"
 fastapi = ">=0.95.1"
 cryptography = ">=39.0.2,<41.0.0"
+httpx = ">=0.14.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.0.1"
