@@ -2,16 +2,16 @@
   FastAPI JWT Auth
 </h1>
 
-![Tests](https://github.com/IndominusByte/fastapi-jwt-auth/workflows/Tests/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/IndominusByte/fastapi-jwt-auth/badge.svg?branch=master)](https://coveralls.io/github/IndominusByte/fastapi-jwt-auth?branch=master)
+![Tests](https://github.com/LibreNZ/fastapi-jwt-auth/workflows/Tests/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/LibreNZ/fastapi-jwt-auth/badge.svg?branch=master)](https://coveralls.io/github/LibreNZ/fastapi-jwt-auth?branch=master)
 [![PyPI version](https://badge.fury.io/py/fastapi-jwt-auth.svg)](https://badge.fury.io/py/fastapi-jwt-auth)
 [![Downloads](https://static.pepy.tech/personalized-badge/fastapi-jwt-auth?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/fastapi-jwt-auth)
 
 ---
 
-**Documentation**: <a href="https://indominusbyte.github.io/fastapi-jwt-auth" target="_blank">https://indominusbyte.github.io/fastapi-jwt-auth</a>
+**Documentation**: <a href="https://LibreNZ.github.io/fastapi-jwt-auth" target="_blank">https://LibreNZ.github.io/fastapi-jwt-auth</a>
 
-**Source Code**: <a href="https://github.com/IndominusByte/fastapi-jwt-auth" target="_blank">https://github.com/IndominusByte/fastapi-jwt-auth</a>
+**Source Code**: <a href="https://github.com/LibreNZ/fastapi-jwt-auth" target="_blank">https://github.com/LibreNZ/fastapi-jwt-auth</a>
 
 ---
 

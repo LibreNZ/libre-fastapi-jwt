@@ -5,10 +5,10 @@ build-backend = "poetry.masonry.api"
 [tool.poetry]
 name = "fastapi-jwt-auth"
 version="0.5.1"
-authors = ["Nyoman Pradipta Dewantara <nyomanpradipta120@gmail.com>"]
+authors = ["Libre NZ <github libre.nz>"]
 description = "FastAPI JWT Auth"
-homepage = "https://github.com/IndominusByte/fastapi-jwt-auth"
-repository = "https://github.com/IndominusByte/fastapi-jwt-auth"
+homepage = "https://github.com/LibreNZ/fastapi-jwt-auth"
+repository = "https://github.com/LibreNZ/fastapi-jwt-auth"
 classifiers = [
   "Environment :: Web Environment",
   "Intended Audience :: Developers",

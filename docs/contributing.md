@@ -2,7 +2,7 @@
 
 This project is still quite new and therefore having your feedback will really help to
 prioritize relevant feature developments :rocket:. If you want to contribute thankss a lot :smile:, you can
-open an <a href="https://github.com/IndominusByte/fastapi-jwt-auth/issues/new" target="_blank">issue</a> on Github.
+open an <a href="https://github.com/LibreNZ/fastapi-jwt-auth/issues/new" target="_blank">issue</a> on Github.
 
 ## Developing
 
