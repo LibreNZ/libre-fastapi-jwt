@@ -1,13 +1,11 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
 
-[tool.flit.metadata]
-module = "fastapi_jwt_auth-latest"
-dist-name = "fastapi-jwt-auth-latest"
-authors = ["Libre NZ <github libre.nz>"]
-home-page = "https://github.com/LibreNZ/fastapi-jwt-auth"
-
+[project]
+name = "fastapi-jwt-auth"
+authors = [{ name = "Libre NZ", email = "github-support@libre.nz" }]
+readme = "README.md"
 classifiers = [
   "Environment :: Web Environment",
   "Intended Audience :: Developers",
@@ -17,36 +15,23 @@ classifiers = [
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
-  "Topic :: Software Development :: Libraries :: Python Modules"
+  "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-
-requires = [
-"fastapi>=0.95.1",
-"PyJWT>=2.6.0"
-]
-
-description-file = "README.md"
 requires-python = ">=3.8"
+dynamic = ["version", "description"]
+dependencies = ["fastapi>=0.95.1", "PyJWT>=2.6.0"]
 
-[tool.flit.metadata.urls]
+
+[project.urls]
 Documentation = "https://LibreNZ.github.io/fastapi-jwt-auth/"
+Source = "https://github.com/LibreNZ/fastapi-jwt-auth"
 
-[tool.flit.metadata.requires-extra]
-test = [
-  "pytest==7.1.2",
-  "pytest-cov==3.0.0",
-  "coveralls==3.3.1"
-]
-
+[project.optional-dependencies]
+test = ["pytest==7.1.2", "pytest-cov==3.0.0", "coveralls==3.3.1"]
 doc = [
   "mkdocs==1.3.0",
   "mkdocs-material==8.3.7",
-  "markdown-include==0.5.1,<0.6.0"
+  "markdown-include==0.5.1,<0.6.0",
 ]
-
-dev = [
-  "cryptography==37.0.3",
-  "uvicorn==0.17.6"
-]
-
+dev = ["cryptography==37.0.3", "uvicorn==0.17.6"]
 asymmetric = ["cryptography==37.0.3"]
