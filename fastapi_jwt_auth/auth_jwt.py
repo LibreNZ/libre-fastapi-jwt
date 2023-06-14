@@ -116,7 +116,7 @@ class AuthJWT(AuthConfig):
 
         if algorithm in asymmetric_algorithms and not has_crypto:
             raise RuntimeError(
-                "Missing dependencies for using asymmetric algorithms. run 'pip install fastapi-another-jwt-auth[asymmetric]'"
+                "Missing dependencies for using asymmetric algorithms. run 'pip install fastapi-jwt-auth[asymmetric]'"
             )
 
         if process == "encode":

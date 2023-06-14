@@ -29,7 +29,7 @@ To check it worked, use:
 ```bash
 $ which pip
 
-some/directory/fastapi-another-jwt-auth/env/bin/pip
+some/directory/fastapi-jwt-auth/env/bin/pip
 ```
 
 If it shows the pip binary at env/bin/pip then it worked. 🎉
