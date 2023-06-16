@@ -3,7 +3,6 @@
 </h1>
 
 ![Tests](https://github.com/LibreNZ/fastapi-jwt-auth/workflows/Tests/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/LibreNZ/fastapi-jwt-auth/badge.svg?branch=master)](https://coveralls.io/github/LibreNZ/fastapi-jwt-auth?branch=master)
 [![PyPI version](https://badge.fury.io/py/fastapi-jwt-auth.svg)](https://badge.fury.io/py/fastapi-jwt-auth)
 [![Downloads](https://static.pepy.tech/personalized-badge/fastapi-jwt-auth?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/fastapi-jwt-auth)
 
