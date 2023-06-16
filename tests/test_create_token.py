@@ -186,14 +186,21 @@ def test_create_valid_user_claims(Authorize, test_settings):
     )
 
     assert (
-        jwt.decode(access_token, "testing", algorithms="HS256")["my_access"] == "yeah",
+        jwt.decode(access_token, "testing", algorithms="HS256")["my_access"] == "yeah"
+    )
+    assert (
         jwt.decode(refresh_token, "testing", algorithms="HS256")["my_refresh"]
-        == "hello",
+        == "hello"
+    )
+    assert (
         jwt.decode(pair_token["access_token"], "testing", algorithms="HS256")[
             "my_access"
         ]
-        == "yeah",
+        == "yeah"
+    )
+    assert (
         jwt.decode(pair_token["refresh_token"], "testing", algorithms="HS256")[
             "my_refresh"
-        ],
+        ]
+        == "hello"
     )
