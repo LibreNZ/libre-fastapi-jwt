@@ -623,7 +623,7 @@ class AuthJWT(AuthConfig):
                 if not hmac.compare_digest(csrf_token, decoded_token["csrf"]):
                     raise CSRFError(
                         status_code=401,
-                        message="CSRF double submit tokens do not match",
+                        message="CSRF double submitted tokens do not match",
                     )
 
     def _verify_and_get_jwt_in_cookies(
