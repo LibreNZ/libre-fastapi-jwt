@@ -15,9 +15,11 @@ def reset_config():
     guarantee that config is unchanged after test.
     """
     yield
+
     @AuthJWT.load_config
     def default_conf():
         return LoadConfig(
             authjwt_secret_key="secret",
-            authjwt_cookie_samesite='strict',
+            authjwt_cookie_samesite="strict",
+            authjwt_cookie_secure=True,
         )
