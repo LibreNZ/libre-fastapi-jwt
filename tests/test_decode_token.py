@@ -111,20 +111,28 @@ def test_verified_token(client, encoded_token, Authorize):
 
     access_token = Authorize.create_access_token(subject="test")
     refresh_token = Authorize.create_refresh_token(subject="test")
+    pair_token = Authorize.create_pair_token(subject="test")
     time.sleep(2)
     # JWT payload is now expired
     # But with some leeway, it will still validate
+    # Access
     response = client.get(
         "/protected", headers={"Authorization": f"Bearer {access_token}"}
     )
     assert response.status_code == 200
     assert response.json() == {"hello": "world"}
-
+    # Refresh
     response = client.get(
         "/refresh_token", headers={"Authorization": f"Bearer {refresh_token}"}
     )
     assert response.status_code == 200
     assert response.json() == "test"
+    # Pair
+    response = client.get(
+        "/pair_token", headers={"Authorization": f"Bearer {pair_token}"}
+    )
+    assert response.status_code == 200
+    assert response.json() == {"hello": "world"}
 
     # Valid Token
     response = client.get(
