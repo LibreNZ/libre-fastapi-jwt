@@ -1,7 +1,8 @@
-import jwt, re, uuid, hmac
+import jwt, re, hmac
+from uuid import uuid4
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional, Sequence, Union
-from fastapi import Request, Response, WebSocket
+from fastapi import Request, Response, WebSocket, Header
 from jwt.algorithms import has_crypto, requires_cryptography
 from jwt.exceptions import ExpiredSignatureError
 from fastapi_jwt_auth.auth_config import AuthConfig
@@ -17,8 +18,6 @@ from fastapi_jwt_auth.exceptions import (
     RefreshTokenRequired,
     RevokedTokenError,
 )
-from fastapi import Header
-from uuid import uuid4
 
 
 class AuthJWT(AuthConfig):
@@ -81,7 +80,7 @@ class AuthJWT(AuthConfig):
             self._token = parts[1]
 
     def _get_jwt_identifier(self) -> str:
-        return str(uuid.uuid4())
+        return str(uuid4())
 
     def _get_int_from_datetime(self, value: datetime) -> int:
         """
@@ -148,6 +147,8 @@ class AuthJWT(AuthConfig):
                 )
 
             return self._public_key
+
+        return str(f"{process} failed")
 
     def _create_token(
         self,
@@ -358,12 +359,12 @@ class AuthJWT(AuthConfig):
     def create_pair_token(
         self,
         subject: Union[str, int],
+        fresh: Optional[bool] = False,
         algorithm: Optional[str] = None,
         headers: Optional[Dict] = None,
         expires_time: Optional[Union[timedelta, int, bool]] = None,
         audience: Optional[Union[str, Sequence[str]]] = None,
         user_claims: Optional[Dict] = {},
-        fresh: Optional[bool] = False,
     ) -> str:
         """
         Create a refresh token with 30 days for expired time (default),
@@ -651,18 +652,21 @@ class AuthJWT(AuthConfig):
         if type_token == "access":
             cookie_key = self._access_cookie_key
             cookie = request.cookies.get(cookie_key)
+            if not cookie:
+                raise MissingTokenError(
+                    status_code=401, message="Missing cookie {}".format(cookie_key)
+                )
             if not isinstance(request, WebSocket):
                 csrf_token = request.headers.get(self._access_csrf_header_name)
         if type_token == "refresh":
             cookie_key = self._refresh_cookie_key
             cookie = request.cookies.get(cookie_key)
+            if not cookie:
+                raise MissingTokenError(
+                    status_code=401, message="Missing cookie {}".format(cookie_key)
+                )
             if not isinstance(request, WebSocket):
                 csrf_token = request.headers.get(self._refresh_csrf_header_name)
-
-        if not cookie:
-            raise MissingTokenError(
-                status_code=401, message="Missing cookie {}".format(cookie_key)
-            )
 
         if self._cookie_csrf_protect and not csrf_token:
             if isinstance(request, WebSocket) or request.method in self._csrf_methods:

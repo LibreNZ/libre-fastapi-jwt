@@ -3,6 +3,7 @@
 </h1>
 
 [![Tests](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/codeql.yml)
 [![PyPI version](https://badge.fury.io/py/fastapi-jwt-auth.svg)](https://badge.fury.io/py/fastapi-jwt-auth)
 [![Downloads](https://static.pepy.tech/personalized-badge/fastapi-jwt-auth?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/fastapi-jwt-auth)
 
