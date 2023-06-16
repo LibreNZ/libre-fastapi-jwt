@@ -650,6 +650,9 @@ class AuthJWT(AuthConfig):
         if not isinstance(request, (Request, WebSocket)):
             raise TypeError("request must be an instance of 'Request' or 'WebSocket'")
 
+        # Initialize cookie_key with a default value
+        cookie_key = None
+
         # Get token type and CSRF token, set cookie_key
         if type_token == "access":
             cookie_key = self._access_cookie_key
