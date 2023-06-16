@@ -364,7 +364,7 @@ class AuthJWT(AuthConfig):
         headers: Optional[Dict] = None,
         expires_time: Optional[Union[timedelta, int, bool]] = None,
         audience: Optional[Union[str, Sequence[str]]] = None,
-        user_claims: Optional[Dict] = {},
+        user_claims: Optional[Dict] = {"aid": str(uuid4())},
     ) -> str:
         """
         Create a refresh token with 30 days for expired time (default),
@@ -372,7 +372,6 @@ class AuthJWT(AuthConfig):
 
         :return: hash token
         """
-        user_claims["aid"] = str(uuid4())
 
         refresh = self._create_token(
             subject=subject,
@@ -649,22 +648,19 @@ class AuthJWT(AuthConfig):
         if not isinstance(request, (Request, WebSocket)):
             raise TypeError("request must be an instance of 'Request' or 'WebSocket'")
 
+        # Set cookie variable, validate it is not None (aka null/empty)
+        cookie = request.cookies.get(cookie_key)
+        if not cookie:
+            raise MissingTokenError(
+                status_code=401, message="Missing cookie {}".format(cookie_key)
+            )
+
         if type_token == "access":
             cookie_key = self._access_cookie_key
-            cookie = request.cookies.get(cookie_key)
-            if not cookie:
-                raise MissingTokenError(
-                    status_code=401, message="Missing cookie {}".format(cookie_key)
-                )
             if not isinstance(request, WebSocket):
                 csrf_token = request.headers.get(self._access_csrf_header_name)
         if type_token == "refresh":
             cookie_key = self._refresh_cookie_key
-            cookie = request.cookies.get(cookie_key)
-            if not cookie:
-                raise MissingTokenError(
-                    status_code=401, message="Missing cookie {}".format(cookie_key)
-                )
             if not isinstance(request, WebSocket):
                 csrf_token = request.headers.get(self._refresh_csrf_header_name)
 
@@ -685,7 +681,7 @@ class AuthJWT(AuthConfig):
                 if not hmac.compare_digest(csrf_token, decoded_token["csrf"]):
                     raise CSRFError(
                         status_code=401,
-                        message="CSRF double submit tokens do not match",
+                        message="CSRF double submitted tokens do not match",
                     )
 
     def _verify_jwt_optional_in_request(self, token: str) -> None:
@@ -721,7 +717,7 @@ class AuthJWT(AuthConfig):
         :param fresh: check freshness token if True
         """
         if type_token not in ["access", "refresh"]:
-            raise ValueError("type_token must be between 'access' or 'refresh'")
+            raise ValueError("type_token must be either 'access' or 'refresh'")
         if token_from not in ["headers", "cookies", "websocket"]:
             raise ValueError(
                 "token_from must be between 'headers', 'cookies', 'websocket'"
