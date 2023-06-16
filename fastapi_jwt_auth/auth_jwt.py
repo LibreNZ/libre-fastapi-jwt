@@ -648,13 +648,7 @@ class AuthJWT(AuthConfig):
         if not isinstance(request, (Request, WebSocket)):
             raise TypeError("request must be an instance of 'Request' or 'WebSocket'")
 
-        # Set cookie variable, validate it is not None (aka null/empty)
-        cookie = request.cookies.get(cookie_key)
-        if not cookie:
-            raise MissingTokenError(
-                status_code=401, message="Missing cookie {}".format(cookie_key)
-            )
-
+        # Get token type and CSRF token, set cookie_key
         if type_token == "access":
             cookie_key = self._access_cookie_key
             if not isinstance(request, WebSocket):
@@ -663,6 +657,13 @@ class AuthJWT(AuthConfig):
             cookie_key = self._refresh_cookie_key
             if not isinstance(request, WebSocket):
                 csrf_token = request.headers.get(self._refresh_csrf_header_name)
+
+        # Set cookie variable, validate it is not None (aka null/empty)
+        cookie = request.cookies.get(cookie_key)
+        if not cookie:
+            raise MissingTokenError(
+                status_code=401, message="Missing cookie {}".format(cookie_key)
+            )
 
         if self._cookie_csrf_protect and not csrf_token:
             if isinstance(request, WebSocket) or request.method in self._csrf_methods:
