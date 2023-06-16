@@ -60,11 +60,6 @@ def refresh_token(Authorize):
     return Authorize.create_refresh_token(subject="test")
 
 
-@pytest.fixture(scope="module")
-def pair_token(Authorize):
-    return Authorize.create_pair_token(subject="test", fresh=True)
-
-
 @pytest.mark.parametrize(
     "url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"]
 )
