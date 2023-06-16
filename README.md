@@ -2,12 +2,12 @@
   FastAPI Another JWT Auth
 </h1>
 
-![Tests](https://github.com/LibreNZ/fastapi-jwt-auth/workflows/Tests/badge.svg)
+[![Tests](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/tests.yml)
 [![PyPI version](https://badge.fury.io/py/fastapi-jwt-auth.svg)](https://badge.fury.io/py/fastapi-jwt-auth)
 [![Downloads](https://static.pepy.tech/personalized-badge/fastapi-jwt-auth?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/fastapi-jwt-auth)
 
 ---
-<h2> The project is based on <a href="https://pypi.org/project/fastapi-jwt-auth/" target="_blank">Fastapi-jwt-auth</a> that is no longer maintained. </h2> 
+<h3> BTW - The project is based on <a href="https://pypi.org/project/fastapi-jwt-auth/" target="_blank">Fastapi-jwt-auth</a> that is no longer maintained. </h3> 
 
 **Documentation**: <a href="https://LibreNZ.github.io/fastapi-jwt-auth" target="_blank">https://LibreNZ.github.io/fastapi-jwt-auth</a>
 
