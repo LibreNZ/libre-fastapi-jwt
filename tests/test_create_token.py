@@ -99,35 +99,44 @@ def test_create_dynamic_refresh_token_expires(Authorize, test_settings):
 def test_create_dynamic_pair_token_expires(Authorize, test_settings):
     expires_time = int(datetime.now(timezone.utc).timestamp()) + 90
     token = Authorize.create_pair_token(subject=1, expires_time=90)
-    assert (
+    assert_access_token = (
         jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time,
-        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time,
+        == expires_time
     )
+    assert_refresh_token = (
+        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
+        == expires_time
+    )
+    assert assert_access_token and assert_refresh_token
 
     expires_time = int(datetime.now(timezone.utc).timestamp()) + 86400
     token = Authorize.create_pair_token(subject=1, expires_time=timedelta(days=1))
-    assert (
+    assert_access_token = (
         jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time,
-        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time,
+        == expires_time
     )
+    assert_refresh_token = (
+        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
+        == expires_time
+    )
+    assert assert_access_token and assert_refresh_token
 
     expires_time = int(datetime.now(timezone.utc).timestamp()) + 2
     token = Authorize.create_pair_token(subject=1, expires_time=True)
-    assert (
+    assert_access_token = (
         jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time,
-        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time,
+        == expires_time
     )
+    assert_refresh_token = (
+        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
+        == expires_time
+    )
+    assert assert_access_token and assert_refresh_token
 
     token = Authorize.create_pair_token(subject=1, expires_time=False)
-    assert (
-        "exp" not in jwt.decode(token["access_token"], "testing", algorithms="HS256"),
-        "exp" not in jwt.decode(token["refresh_token"], "testing", algorithms="HS256"),
+    assert "exp" not in jwt.decode(token["access_token"], "testing", algorithms="HS256")
+    assert "exp" not in jwt.decode(
+        token["refresh_token"], "testing", algorithms="HS256"
     )
 
     with pytest.raises(TypeError, match=r"expires_time"):
