@@ -643,8 +643,6 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token
         :param fresh: check freshness token if True
         """
-        # Initialize nonlocal variable
-        cookie_key = None
 
         # Validate input
         if type_token not in ["access", "refresh"]:
@@ -662,13 +660,12 @@ class AuthJWT(AuthConfig):
             if not isinstance(request, WebSocket):
                 csrf_token = request.headers.get(self._refresh_csrf_header_name)
 
-        # Set cookie_key and cookie variable, check is not None (aka null/empty)
-        if not cookie_key:
-            cookie = request.cookies.get(cookie_key)
-            if not cookie:
-                raise MissingTokenError(
-                    status_code=401, message="Missing cookie {}".format(cookie_key)
-                )
+        # Set cookie variable, validate it is not None (aka null/empty)
+        cookie = request.cookies.get(cookie_key)
+        if not cookie:
+            raise MissingTokenError(
+                status_code=401, message="Missing cookie {}".format(cookie_key)
+            )
 
         if self._cookie_csrf_protect and not csrf_token:
             if isinstance(request, WebSocket) or request.method in self._csrf_methods:
