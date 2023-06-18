@@ -1,5 +1,5 @@
 import pytest, os, jwt
-from fastapi_jwt_auth import AuthJWT
+from libre_fastapi_jwt import AuthJWT
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
 from pydantic import BaseSettings, ValidationError

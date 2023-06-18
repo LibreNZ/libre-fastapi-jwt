@@ -5,8 +5,8 @@ theme:
   palette:
     primary: black
 
-repo_name: LibreNZ/fastapi-jwt-auth
-repo_url: https://github.com/LibreNZ/fastapi-jwt-auth
+repo_name: LibreNZ/libre-fastapi-jwt
+repo_url: https://github.com/LibreNZ/libre-fastapi-jwt
 
 markdown_extensions:
   - markdown_include.include:
@@ -18,7 +18,7 @@ markdown_extensions:
   - pymdownx.magiclink:
 
       user: LibreNZ
-      repo: fastapi-jwt-auth
+      repo: libre-fastapi-jwt
 
       repo_url_shorthand: true
   - pymdownx.emoji:

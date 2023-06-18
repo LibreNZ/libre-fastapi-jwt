@@ -4,7 +4,7 @@ from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 from pydantic import BaseSettings
 
-from fastapi_jwt_auth import AuthJWT
+from libre_fastapi_jwt import AuthJWT
 
 
 @pytest.fixture(scope="function")

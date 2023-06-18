@@ -1,11 +1,12 @@
-from fastapi_jwt_auth.config import LoadConfig
+from libre_fastapi_jwt.config import LoadConfig
 from pydantic import ValidationError
 from typing import Callable, List
 from datetime import timedelta
 
+
 class AuthConfig:
     _token = None
-    _token_location = {'headers'}
+    _token_location = {"headers"}
 
     _secret_key = None
     _public_key = None
@@ -17,7 +18,7 @@ class AuthConfig:
     _decode_issuer = None
     _decode_audience = None
     _denylist_enabled = False
-    _denylist_token_checks = {'access','refresh'}
+    _denylist_token_checks = {"access", "refresh"}
     _header_name = "Authorization"
     _header_type = "Bearer"
     _token_in_denylist_callback = None
@@ -42,7 +43,7 @@ class AuthConfig:
     _refresh_csrf_cookie_path = "/"
     _access_csrf_header_name = "X-CSRF-Token"
     _refresh_csrf_header_name = "X-CSRF-Token"
-    _csrf_methods = {'POST','PUT','PATCH','DELETE'}
+    _csrf_methods = {"POST", "PUT", "PATCH", "DELETE"}
 
     # options to adjust token's type claim
     _token_type_claim = True
@@ -52,16 +53,16 @@ class AuthConfig:
 
     @property
     def jwt_in_cookies(self) -> bool:
-        return 'cookies' in self._token_location
+        return "cookies" in self._token_location
 
     @property
     def jwt_in_headers(self) -> bool:
-        return 'headers' in self._token_location
+        return "headers" in self._token_location
 
     @classmethod
-    def load_config(cls, settings: Callable[...,List[tuple]]) -> "AuthConfig":
+    def load_config(cls, settings: Callable[..., List[tuple]]) -> "AuthConfig":
         try:
-            config = LoadConfig(**{key.lower():value for key,value in settings()})
+            config = LoadConfig(**{key.lower(): value for key, value in settings()})
 
             cls._token_location = config.authjwt_token_location
             cls._secret_key = config.authjwt_secret_key
@@ -107,7 +108,7 @@ class AuthConfig:
             raise TypeError("Config must be pydantic 'BaseSettings' or list of tuple")
 
     @classmethod
-    def token_in_denylist_loader(cls, callback: Callable[...,bool]) -> "AuthConfig":
+    def token_in_denylist_loader(cls, callback: Callable[..., bool]) -> "AuthConfig":
         """
         This decorator sets the callback function that will be called when
         a protected endpoint is accessed and will check if the JWT has been

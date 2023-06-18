@@ -2,17 +2,17 @@
   FastAPI JWT Auth
 </h1>
 
-[![Tests](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/tests.yml)
-[![CodeQL](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/LibreNZ/fastapi-jwt-auth/actions/workflows/codeql.yml)
+[![Tests](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/codeql.yml)
 [![PyPI version](https://badge.fury.io/py/libre-fastapi-jwt.svg)](https://badge.fury.io/py/libre-fastapi-jwt)
-[![Downloads](https://static.pepy.tech/personalized-badge/fastapi-jwt-auth?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/fastapi-jwt-auth)
+[![Downloads](https://static.pepy.tech/personalized-badge/libre-fastapi-jwt?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/libre-fastapi-jwt)
 
 ---
-<h3> BTW - The project is based on <a href="https://pypi.org/project/fastapi-jwt-auth/" target="_blank">Fastapi-jwt-auth</a> that is no longer maintained. </h3> 
+<h3> BTW - The project is based on <a href="https://pypi.org/project/libre-fastapi-jwt/" target="_blank">Fastapi-jwt-auth</a> that is no longer maintained. </h3> 
 
-**Documentation**: <a href="https://LibreNZ.github.io/fastapi-jwt-auth" target="_blank">https://LibreNZ.github.io/fastapi-jwt-auth</a>
+**Documentation**: <a href="https://LibreNZ.github.io/libre-fastapi-jwt" target="_blank">https://LibreNZ.github.io/libre-fastapi-jwt</a>
 
-**Source Code**: <a href="https://github.com/LibreNZ/fastapi-jwt-auth" target="_blank">https://github.com/LibreNZ/fastapi-jwt-auth</a>
+**Source Code**: <a href="https://github.com/LibreNZ/libre-fastapi-jwt" target="_blank">https://github.com/LibreNZ/libre-fastapi-jwt</a>
 
 ---
 
