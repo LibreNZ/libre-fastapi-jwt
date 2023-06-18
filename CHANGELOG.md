@@ -1,3 +1,10 @@
+## 0.20.3
+* Renamed package in order to publish it in pypi
+* Scanned code with CodeQL and addressed all security issues found
+* Updated all dependencies as identified by dependabot
+* Merged all (to this date) pull request originally opened to the original author
+* Added missing tests for functionality added on the above PRs
+
 ## 0.19.0
 * Updated packages in general
 * Merged with fastapi-another-jwt-auth
