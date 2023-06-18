@@ -2,8 +2,8 @@
   FastAPI JWT Auth
 </h1>
 
-[![Tests](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/tests.yml)
-[![CodeQL](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/codeql.yml/badge.svg?branch=master)](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/codeql.yml)
+[![Tests](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/tests.yml)
+[![CodeQL](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/LibreNZ/libre-fastapi-jwt/actions/workflows/codeql.yml)
 [![PyPI version](https://badge.fury.io/py/libre-fastapi-jwt.svg)](https://badge.fury.io/py/libre-fastapi-jwt)
 [![Downloads](https://static.pepy.tech/personalized-badge/libre-fastapi-jwt?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/libre-fastapi-jwt)
 
