@@ -64,7 +64,7 @@ def fresh_login(user: User, Authorize: AuthJWT = Depends()):
     make a fresh token for a user (by verifying they have the
     correct username and password). Unlike the standard login endpoint,
     this will only return a new access token, so that we don't keep
-    generating new refresh tokens, which entirely defeats their point.
+    generating new refresh tokens, which entirely defeats the point.
     """
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 """
 Note: This is just a basic example how to enable cookies.
-This is vulnerable to CSRF attacks, and should not be used this example.
+This is vulnerable to CSRF attacks and should not be used in any real world scenario.
 """
 
 app = FastAPI()
@@ -47,7 +47,7 @@ def login(user: User, Authorize: AuthJWT = Depends()):
     # Set the JWT cookies in the response
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "Successfully login"}
+    return {"msg": "Successful login"}
 
 
 @app.post("/refresh")
@@ -71,7 +71,7 @@ def logout(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
     Authorize.unset_jwt_cookies()
-    return {"msg": "Successfully logout"}
+    return {"msg": "Successful logout"}
 
 
 @app.get("/protected")

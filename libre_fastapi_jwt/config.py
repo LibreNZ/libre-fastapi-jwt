@@ -25,20 +25,20 @@ class LoadConfig(BaseModel):
     authjwt_header_name: Optional[StrictStr] = "Authorization"
     authjwt_header_type: Optional[StrictStr] = "Bearer"
     authjwt_access_token_expires: Optional[Union[StrictBool,StrictInt,timedelta]] = timedelta(minutes=15)
-    authjwt_refresh_token_expires: Optional[Union[StrictBool,StrictInt,timedelta]] = timedelta(days=30)
+    authjwt_refresh_token_expires: Optional[Union[StrictBool,StrictInt,timedelta]] = timedelta(days=14)
     # option for create cookies
-    authjwt_access_cookie_key: Optional[StrictStr] = "access_token_cookie"
-    authjwt_refresh_cookie_key: Optional[StrictStr] = "refresh_token_cookie"
+    authjwt_access_cookie_key: Optional[StrictStr] = "__Host-access_token"
+    authjwt_refresh_cookie_key: Optional[StrictStr] = "__Host-refresh_token"
     authjwt_access_cookie_path: Optional[StrictStr] = "/"
     authjwt_refresh_cookie_path: Optional[StrictStr] = "/"
-    authjwt_cookie_max_age: Optional[StrictInt] = None
+    authjwt_cookie_max_age: Optional[StrictInt] = 86400
     authjwt_cookie_domain: Optional[StrictStr] = None
-    authjwt_cookie_secure: Optional[StrictBool] = False
-    authjwt_cookie_samesite: Optional[StrictStr] = None
+    authjwt_cookie_secure: Optional[StrictBool] = True
+    authjwt_cookie_samesite: Optional[StrictStr] = "Lax"
     # option for double submit csrf protection
     authjwt_cookie_csrf_protect: Optional[StrictBool] = True
-    authjwt_access_csrf_cookie_key: Optional[StrictStr] = "csrf_access_token"
-    authjwt_refresh_csrf_cookie_key: Optional[StrictStr] = "csrf_refresh_token"
+    authjwt_access_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_Access"
+    authjwt_refresh_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_Refresh"
     authjwt_access_csrf_cookie_path: Optional[StrictStr] = "/"
     authjwt_refresh_csrf_cookie_path: Optional[StrictStr] = "/"
     authjwt_access_csrf_header_name: Optional[StrictStr] = "X-CSRF-Token"

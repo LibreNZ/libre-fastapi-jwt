@@ -314,7 +314,7 @@ class AuthJWT(AuthConfig):
         user_claims: Optional[Dict] = {},
     ) -> str:
         """
-        Create a access token with 15 minutes for expired time (default),
+        Create a access token with X minutes for expired time (default),
         info for param and return check to function create token
 
         :return: hash token
@@ -341,7 +341,7 @@ class AuthJWT(AuthConfig):
         user_claims: Optional[Dict] = {},
     ) -> str:
         """
-        Create a refresh token with 30 days for expired time (default),
+        Create a refresh token with X days for expired time (default),
         info for param and return check to function create token
 
         :return: hash token
@@ -367,7 +367,7 @@ class AuthJWT(AuthConfig):
         user_claims: Optional[Dict] = {"aid": str(uuid4())},
     ) -> str:
         """
-        Create a refresh token with 30 days for expired time (default),
+        Create a refresh token with X days for expired time (default),
         info for param and return check to function create token
 
         :return: hash token
@@ -506,9 +506,85 @@ class AuthJWT(AuthConfig):
                 samesite=self._cookie_samesite,
             )
 
+    def set_pair_cookies(
+        self,
+        encoded_pair_token: str,
+        response: Optional[Response] = None,
+        max_age: Optional[int] = None,
+    ) -> None:
+        """
+        Configures the response to set access AND refresh token in a cookie.
+        this will also set the CSRF double submit values in a separate cookie
+
+        :param encoded_pair_token: Both encoded tokens as returned from create_pair_token() to set in the cookies
+        :param response: The FastAPI response object to set the access cookies in
+        :param max_age: The max age of the cookie value should be the number of seconds (integer)
+        """
+        if not self.jwt_in_cookies:
+            raise RuntimeWarning(
+                "set_pair_cookies() called without 'authjwt_token_location' configured to use cookies"
+            )
+
+        if max_age and not isinstance(max_age, int):
+            raise TypeError("max_age must be a integer")
+        if response and not isinstance(response, Response):
+            raise TypeError("The response must be an object response FastAPI")
+
+        response = response or self._response
+
+        # Set the access JWT in the cookie
+        response.set_cookie(
+            self._access_cookie_key,
+            encoded_pair_token["access_token"],
+            max_age=max_age or self._cookie_max_age,
+            path=self._access_cookie_path,
+            domain=self._cookie_domain,
+            secure=self._cookie_secure,
+            httponly=True,
+            samesite=self._cookie_samesite,
+        )
+
+        # If enabled, set the csrf double submit access cookie
+        if self._cookie_csrf_protect:
+            response.set_cookie(
+                self._access_csrf_cookie_key,
+                self._get_csrf_token(encoded_pair_token["access_token"]),
+                max_age=max_age or self._cookie_max_age,
+                path=self._access_csrf_cookie_path,
+                domain=self._cookie_domain,
+                secure=self._cookie_secure,
+                httponly=False,
+                samesite=self._cookie_samesite,
+            )
+
+        # Set the refresh JWT in the cookie
+        response.set_cookie(
+            self._refresh_cookie_key,
+            encoded_pair_token["refresh_token"],
+            max_age=max_age or self._cookie_max_age,
+            path=self._refresh_cookie_path,
+            domain=self._cookie_domain,
+            secure=self._cookie_secure,
+            httponly=True,
+            samesite=self._cookie_samesite,
+        )
+
+        # If enabled, set the csrf double submit refresh cookie
+        if self._cookie_csrf_protect:
+            response.set_cookie(
+                self._refresh_csrf_cookie_key,
+                self._get_csrf_token(encoded_pair_token["refresh_token"]),
+                max_age=max_age or self._cookie_max_age,
+                path=self._refresh_csrf_cookie_path,
+                domain=self._cookie_domain,
+                secure=self._cookie_secure,
+                httponly=False,
+                samesite=self._cookie_samesite,
+            )
+
     def unset_jwt_cookies(self, response: Optional[Response] = None) -> None:
         """
-        Unset (delete) all jwt stored in a cookie
+        Unset (delete) all jwt tokens stored in a cookie
 
         :param response: The FastAPI response object to delete the JWT cookies in.
         """
@@ -591,9 +667,10 @@ class AuthJWT(AuthConfig):
         csrf_token: Optional[str] = None,
     ) -> "AuthJWT":
         """
-        Optionally check if cookies have a valid access token. if an access token present in
-        cookies, self._token will set. raises exception error when an access token is invalid
-        or doesn't match with CSRF token double submit
+        - Optionally check if cookies have a valid access token. If an access token is present in
+        cookies, self._token will be set. 
+        - Raise an exception error when an access token is invalid
+        or doesn't match the double submitted CSRF token.
 
         :param request: for identity get cookies from HTTP or WebSocket
         :param csrf_token: the CSRF double submit token
@@ -634,9 +711,10 @@ class AuthJWT(AuthConfig):
         fresh: Optional[bool] = False,
     ) -> "AuthJWT":
         """
-        Check if cookies have a valid access or refresh token. if an token present in
-        cookies, self._token will set. raises exception error when an access or refresh token
-        is invalid or doesn't match with CSRF token double submit
+        - Check if cookies have a valid access or refresh token. If there is a token present in
+        cookies, self._token will be set.
+        - Raise an exception error when an access or refresh token
+        is invalid or doesn't match the double submitted CSRF token.
 
         :param type_token: indicate token is access or refresh token
         :param request: for identity get cookies from HTTP or WebSocket
@@ -653,7 +731,7 @@ class AuthJWT(AuthConfig):
         # Initialize cookie_key with a default value
         cookie_key = None
 
-        # Get token type and CSRF token, set cookie_key
+        # Get token type and CSRF token, set cookie_key. If request comes from WebSocket, grab the CSRF value from the header.
         if type_token == "access":
             cookie_key = self._access_cookie_key
             if not isinstance(request, WebSocket):
@@ -715,7 +793,7 @@ class AuthJWT(AuthConfig):
         fresh: Optional[bool] = False,
     ) -> None:
         """
-        Ensure that the requester has a valid token. this also check the freshness of the access token
+        Ensure that the requester has a valid token. This also check the freshness of the access token
 
         :param token: The encoded JWT
         :param type_token: indicate token is access or refresh token
@@ -723,10 +801,10 @@ class AuthJWT(AuthConfig):
         :param fresh: check freshness token if True
         """
         if type_token not in ["access", "refresh"]:
-            raise ValueError("type_token must be either 'access' or 'refresh'")
+            raise ValueError("type_token must be either: 'access' or 'refresh'")
         if token_from not in ["headers", "cookies", "websocket"]:
             raise ValueError(
-                "token_from must be between 'headers', 'cookies', 'websocket'"
+                "token_from must be either: 'headers', 'cookies' or 'websocket'"
             )
 
         if not token:
@@ -764,7 +842,7 @@ class AuthJWT(AuthConfig):
         self, encoded_token: str, issuer: Optional[str] = None
     ) -> None:
         """
-        Verified token and check if token is revoked
+        Verify for a valid token then verify is not revoked.
 
         :param encoded_token: token hash
         :param issuer: expected issuer in the JWT

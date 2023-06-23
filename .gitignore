@@ -36,3 +36,6 @@ htmlcov/
 test.py
 
 .DS_STORE
+
+# local certs
+*.pem

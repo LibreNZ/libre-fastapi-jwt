@@ -237,9 +237,9 @@ def test_invalid_instance_websocket(Authorize):
 )
 def test_missing_cookie(url, client):
     cookie_key = (
-        "access_token_cookie"
+        "__Host-access_token"
         if url != "/jwt-refresh-required-cookies"
-        else "refresh_token_cookie"
+        else "__Host-refresh_token"
     )
     with client.websocket_connect(url + "?csrf_token=") as websocket:
         data = websocket.receive_text()
@@ -394,8 +394,8 @@ def test_valid_access_endpoint_with_csrf(url, client):
         ]
 
     res = client.get("/all-token")
-    csrf_access = res.cookies.get("csrf_access_token")
-    csrf_refresh = res.cookies.get("csrf_refresh_token")
+    csrf_access = res.cookies.get("__Host-CSRF_Access")
+    csrf_refresh = res.cookies.get("__Host-CSRF_Refresh")
 
     if url == "/jwt-refresh-required-cookies":
         with client.websocket_connect(url + f"?csrf_token={csrf_refresh}") as websocket:
