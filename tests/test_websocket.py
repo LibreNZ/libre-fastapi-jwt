@@ -29,7 +29,7 @@ def client():
         await websocket.accept()
         try:
             Authorize.jwt_required("websocket", token=token)
-            await websocket.send_text("Successfully Login!")
+            await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
         await websocket.close()
@@ -45,7 +45,7 @@ def client():
             Authorize.jwt_required(
                 "websocket", websocket=websocket, csrf_token=csrf_token
             )
-            await websocket.send_text("Successfully Login!")
+            await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
         await websocket.close()
@@ -91,7 +91,7 @@ def client():
         await websocket.accept()
         try:
             Authorize.jwt_refresh_token_required("websocket", token=token)
-            await websocket.send_text("Successfully Login!")
+            await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
         await websocket.close()
@@ -107,7 +107,7 @@ def client():
             Authorize.jwt_refresh_token_required(
                 "websocket", websocket=websocket, csrf_token=csrf_token
             )
-            await websocket.send_text("Successfully Login!")
+            await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
         await websocket.close()
@@ -119,7 +119,7 @@ def client():
         await websocket.accept()
         try:
             Authorize.fresh_jwt_required("websocket", token=token)
-            await websocket.send_text("Successfully Login!")
+            await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
         await websocket.close()
@@ -135,7 +135,7 @@ def client():
             Authorize.fresh_jwt_required(
                 "websocket", websocket=websocket, csrf_token=csrf_token
             )
-            await websocket.send_text("Successfully Login!")
+            await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
         await websocket.close()
@@ -169,7 +169,7 @@ def test_jwt_required_websocket(client, Authorize):
     token = Authorize.create_access_token(subject="test")
     with client.websocket_connect(url + f"?token={token}") as websocket:
         data = websocket.receive_text()
-        assert data == "Successfully Login!"
+        assert data == "Successful Login!"
 
 
 def test_jwt_optional_websocket(client, Authorize):
@@ -196,7 +196,7 @@ def test_refresh_required_websocket(client, Authorize):
     token = Authorize.create_refresh_token(subject="test")
     with client.websocket_connect(url + f"?token={token}") as websocket:
         data = websocket.receive_text()
-        assert data == "Successfully Login!"
+        assert data == "Successful Login!"
 
 
 def test_fresh_jwt_required_websocket(client, Authorize):
@@ -210,7 +210,7 @@ def test_fresh_jwt_required_websocket(client, Authorize):
     token = Authorize.create_access_token(subject="test", fresh=True)
     with client.websocket_connect(url + f"?token={token}") as websocket:
         data = websocket.receive_text()
-        assert data == "Successfully Login!"
+        assert data == "Successful Login!"
 
 
 # ========= COOKIES ========
@@ -243,7 +243,7 @@ def test_missing_cookie(url, client):
     )
     with client.websocket_connect(url + "?csrf_token=") as websocket:
         data = websocket.receive_text()
-        assert data == f"Missing cookie {cookie_key}"
+        assert data == f"Missing or incorrect cookie. Expected: {cookie_key}"
 
 
 @pytest.mark.parametrize(
@@ -261,6 +261,7 @@ def test_missing_csrf_token(url, client):
         return [
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
+            ("authjwt_cookie_secure", False),
         ]
 
     # required and optional
@@ -279,11 +280,12 @@ def test_missing_csrf_token(url, client):
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_csrf_protect", False),
+            ("authjwt_cookie_secure", False),
         ]
 
     client.get("/all-token")
 
-    msg = "hello world" if url == "/jwt-optional-cookies" else "Successfully Login!"
+    msg = "hello world" if url == "/jwt-optional-cookies" else "Successful Login!"
     with client.websocket_connect(url + "?csrf_token=") as websocket:
         data = websocket.receive_text()
         assert data == msg
@@ -306,6 +308,7 @@ def test_missing_claim_csrf_in_token(url, client):
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_csrf_protect", False),
+            ("authjwt_cookie_secure", False),
         ]
 
     client.get("/all-token")
@@ -315,6 +318,7 @@ def test_missing_claim_csrf_in_token(url, client):
         return [
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
+            ("authjwt_cookie_secure", False),
         ]
 
     with client.websocket_connect(url + "?csrf_token=test") as websocket:
@@ -328,9 +332,10 @@ def test_missing_claim_csrf_in_token(url, client):
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_csrf_protect", False),
+            ("authjwt_cookie_secure", False),
         ]
 
-    msg = "hello world" if url == "/jwt-optional-cookies" else "Successfully Login!"
+    msg = "hello world" if url == "/jwt-optional-cookies" else "Successful Login!"
     with client.websocket_connect(url + "?csrf_token=test") as websocket:
         data = websocket.receive_text()
         assert data == msg
@@ -352,6 +357,7 @@ def test_invalid_csrf_double_submit(url, client):
         return [
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
+            ("authjwt_cookie_secure", False),
         ]
 
     client.get("/all-token")
@@ -369,7 +375,7 @@ def test_invalid_csrf_double_submit(url, client):
             ("authjwt_cookie_csrf_protect", False),
         ]
 
-    msg = "hello world" if url == "/jwt-optional-cookies" else "Successfully Login!"
+    msg = "hello world" if url == "/jwt-optional-cookies" else "Successful Login!"
     with client.websocket_connect(url + "?csrf_token=test") as websocket:
         data = websocket.receive_text()
         assert data == msg
@@ -391,6 +397,7 @@ def test_valid_access_endpoint_with_csrf(url, client):
         return [
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
+            ("authjwt_cookie_secure", False),
         ]
 
     res = client.get("/all-token")
@@ -400,9 +407,9 @@ def test_valid_access_endpoint_with_csrf(url, client):
     if url == "/jwt-refresh-required-cookies":
         with client.websocket_connect(url + f"?csrf_token={csrf_refresh}") as websocket:
             data = websocket.receive_text()
-            assert data == "Successfully Login!"
+            assert data == "Successful Login!"
     else:
-        msg = "hello world" if url == "/jwt-optional-cookies" else "Successfully Login!"
+        msg = "hello world" if url == "/jwt-optional-cookies" else "Successful Login!"
         with client.websocket_connect(url + f"?csrf_token={csrf_access}") as websocket:
             data = websocket.receive_text()
             assert data == msg

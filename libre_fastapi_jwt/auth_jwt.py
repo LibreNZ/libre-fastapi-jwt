@@ -731,7 +731,7 @@ class AuthJWT(AuthConfig):
         # Initialize cookie_key with a default value
         cookie_key = None
 
-        # Get token type and CSRF token, set cookie_key. If request comes from WebSocket, grab the CSRF value from the header.
+        # Get token type and CSRF token, set cookie_key. If request does NOT comes from WebSocket, grab the CSRF value from the header.
         if type_token == "access":
             cookie_key = self._access_cookie_key
             if not isinstance(request, WebSocket):
@@ -745,7 +745,7 @@ class AuthJWT(AuthConfig):
         cookie = request.cookies.get(cookie_key)
         if not cookie:
             raise MissingTokenError(
-                status_code=401, message="Missing cookie {}".format(cookie_key)
+                status_code=401, message="Missing or incorrect cookie. Expected: {}".format(cookie_key)
             )
 
         if self._cookie_csrf_protect and not csrf_token:

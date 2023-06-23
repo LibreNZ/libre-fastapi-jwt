@@ -50,6 +50,7 @@ def test_get_subject_through_cookie_or_headers(url, client):
         return [
             ("authjwt_secret_key", "secret"),
             ("authjwt_token_location", {"headers", "cookies"}),
+            ("authjwt_cookie_secure", False),
         ]
 
     res = client.get("/get-token")
