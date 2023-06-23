@@ -178,7 +178,7 @@ def test_set_cookie_csrf_protect_false(url, client):
 
     cookie_key = url.split("-")[0][1:]
     response = client.get(url)
-    assert response.cookies.get("csrf_{}_token".format(cookie_key)) is None
+    assert response.cookies.get("__Host-CSRF_{}".format(cookie_key)) is None
 
 
 @pytest.mark.parametrize(
@@ -200,7 +200,7 @@ def test_set_cookie_csrf_protect_true(url, client):
 
     cookie_key = url.split("-")[0][1:]
     response = client.get(url)
-    assert response.cookies.get("csrf_{}_token".format(cookie_key)) is not None
+    assert response.cookies.get("__Host-CSRF_{}".format(cookie_key)) is not None
 
 
 def test_unset_all_cookie(client):
@@ -213,18 +213,18 @@ def test_unset_all_cookie(client):
 
     response = client.get("/all-token")
     assert response.cookies.get("__Host-access_token") is not None
-    assert response.cookies.get("__Host-CSRF_Access") is not None
+    assert response.cookies.get("__Host-CSRF_access") is not None
 
     assert response.cookies.get("__Host-refresh_token") is not None
-    assert response.cookies.get("__Host-CSRF_Refresh") is not None
+    assert response.cookies.get("__Host-CSRF_refresh") is not None
 
     response = client.get("/unset-all-token")
 
     assert response.cookies.get("__Host-access_token") is None
-    assert response.cookies.get("__Host-CSRF_Access") is None
+    assert response.cookies.get("__Host-CSRF_access") is None
 
     assert response.cookies.get("__Host-refresh_token") is None
-    assert response.cookies.get("__Host-CSRF_Refresh") is None
+    assert response.cookies.get("__Host-CSRF_refresh") is None
 
 
 def test_unset_all_cookie_response(client):
@@ -237,18 +237,18 @@ def test_unset_all_cookie_response(client):
 
     response = client.get("/all-token-response")
     assert response.cookies.get("__Host-access_token") is not None
-    assert response.cookies.get("__Host-CSRF_Access") is not None
+    assert response.cookies.get("__Host-CSRF_access") is not None
 
     assert response.cookies.get("__Host-refresh_token") is not None
-    assert response.cookies.get("__Host-CSRF_Refresh") is not None
+    assert response.cookies.get("__Host-CSRF_refresh") is not None
 
     response = client.get("/unset-all-token-response")
 
     assert response.cookies.get("__Host-access_token") is None
-    assert response.cookies.get("__Host-CSRF_Access") is None
+    assert response.cookies.get("__Host-CSRF_access") is None
 
     assert response.cookies.get("__Host-refresh_token") is None
-    assert response.cookies.get("__Host-CSRF_Refresh") is None
+    assert response.cookies.get("__Host-CSRF_refresh") is None
 
 
 def test_custom_cookie_key(client):
@@ -332,7 +332,7 @@ def test_cookie_optional_protected(client):
         ]
 
     res = client.get("/access-token")
-    csrf_token = res.cookies.get("__Host-CSRF_Access")
+    csrf_token = res.cookies.get("__Host-CSRF_access")
 
     response = client.post(url)
     assert response.status_code == 401
@@ -380,7 +380,7 @@ def test_cookie_optional_protected(client):
         ]
 
     res = client.get("/access-token")
-    csrf_token = res.cookies.get("__Host-CSRF_Access")
+    csrf_token = res.cookies.get("__Host-CSRF_access")
 
     # valid request
     response = client.post(url, headers={"X-CSRF": csrf_token})
@@ -403,8 +403,8 @@ def test_cookie_protected(url, client):
         ]
 
     res = client.get("/all-token")
-    csrf_access = res.cookies.get("__Host-CSRF_Access")
-    csrf_refresh = res.cookies.get("__Host-CSRF_Refresh")
+    csrf_access = res.cookies.get("__Host-CSRF_access")
+    csrf_refresh = res.cookies.get("__Host-CSRF_refresh")
 
     if url != "/jwt-refresh":
         response = client.post(url, headers={"X-CSRF-Access": csrf_access})
@@ -471,8 +471,8 @@ def test_cookie_protected(url, client):
 
     # csrf token do not match
     res = client.get("/all-token")
-    csrf_access = res.cookies.get("__Host-CSRF_Access")
-    csrf_refresh = res.cookies.get("__Host-CSRF_Refresh")
+    csrf_access = res.cookies.get("__Host-CSRF_access")
+    csrf_refresh = res.cookies.get("__Host-CSRF_refresh")
 
     response = client.post(url, headers={"X-CSRF-Token": "invalid"})
     assert response.status_code == 401

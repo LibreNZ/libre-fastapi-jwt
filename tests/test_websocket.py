@@ -394,8 +394,8 @@ def test_valid_access_endpoint_with_csrf(url, client):
         ]
 
     res = client.get("/all-token")
-    csrf_access = res.cookies.get("__Host-CSRF_Access")
-    csrf_refresh = res.cookies.get("__Host-CSRF_Refresh")
+    csrf_access = res.cookies.get("__Host-CSRF_access")
+    csrf_refresh = res.cookies.get("__Host-CSRF_refresh")
 
     if url == "/jwt-refresh-required-cookies":
         with client.websocket_connect(url + f"?csrf_token={csrf_refresh}") as websocket:

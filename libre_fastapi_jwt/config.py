@@ -37,8 +37,8 @@ class LoadConfig(BaseModel):
     authjwt_cookie_samesite: Optional[StrictStr] = "Lax"
     # option for double submit csrf protection
     authjwt_cookie_csrf_protect: Optional[StrictBool] = True
-    authjwt_access_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_Access"
-    authjwt_refresh_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_Refresh"
+    authjwt_access_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_access"
+    authjwt_refresh_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_refresh"
     authjwt_access_csrf_cookie_path: Optional[StrictStr] = "/"
     authjwt_refresh_csrf_cookie_path: Optional[StrictStr] = "/"
     authjwt_access_csrf_header_name: Optional[StrictStr] = "X-CSRF-Token"
