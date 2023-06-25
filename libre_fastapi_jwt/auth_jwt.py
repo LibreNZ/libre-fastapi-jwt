@@ -203,9 +203,6 @@ class AuthJWT(AuthConfig):
             "refresh": self._refresh_token_type,
         }
 
-        # TODO: Check if we still need this (ToroNZ)
-        # custom_claims = {"type_token": type_token}
-
         if self._token_type_claim:
             custom_claims = {self._token_type_claim_name: token_types[type_token]}
         else:
