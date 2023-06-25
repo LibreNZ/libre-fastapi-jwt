@@ -1,3 +1,10 @@
+## 0.20.4
+* Upgraded cookie defaults to "safer" ones
+* `set_pair_cookies()` now 1st class citizen (though need to sort out user_claims still)
+* use lower case type for csrf cookies
+* Add+Update some exampes
+* Correct some english syntax but there's more to do
+
 ## 0.20.3
 * Renamed package in order to publish it in pypi
 * Scanned code with CodeQL and addressed all security issues found
