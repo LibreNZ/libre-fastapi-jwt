@@ -6,6 +6,9 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+class User(BaseModel):
+    username: str
+    password: str
 
 class Settings(BaseModel):
     authjwt_secret_key: str = "secret"
@@ -36,9 +39,9 @@ html = """
             }
 
             const websocketfun = () => {
-                let csrf_token = getCookie("csrf_access_token")
+                let csrf_token = getCookie("__Host-CSRF_access")
 
-                let ws = new WebSocket(`ws://192.168.18.202:8000/ws?csrf_token=${csrf_token}`)
+                let ws = new WebSocket(`ws://localhost:8000/ws?csrf_token=${csrf_token}`)
                 ws.onmessage = (event) => {
                     let messages = document.getElementById('messages')
                     let message = document.createElement('li')
@@ -68,19 +71,33 @@ async def websocket(
         # Authorize.jwt_optional("websocket",websocket=websocket,csrf_token=csrf_token)
         # Authorize.jwt_refresh_token_required("websocket",websocket=websocket,csrf_token=csrf_token)
         # Authorize.fresh_jwt_required("websocket",websocket=websocket,csrf_token=csrf_token)
-        await websocket.send_text("Successfully Login!")
+        await websocket.send_text("Successful Login!")
         decoded_token = Authorize.get_raw_jwt()
-        await websocket.send_text(f"Here your decoded token: {decoded_token}")
+        await websocket.send_text(f"Here's your decoded token: {decoded_token}")
     except AuthJWTException as err:
         await websocket.send_text(err.message)
         await websocket.close()
 
 
-@app.get("/get-cookie")
-def get_cookie(Authorize: AuthJWT = Depends()):
-    access_token = Authorize.create_access_token(subject="test", fresh=True)
-    refresh_token = Authorize.create_refresh_token(subject="test")
+# provide a method to create access tokens. The create_<type>_token()
+# function is used to actually generate the token to use authorization
+# later in endpoint protected
+@app.post("/login")
+def login(user: User, Authorize: AuthJWT = Depends()):
+    if user.username != "test" or user.password != "test":
+        raise HTTPException(status_code=401, detail="Bad username or password")
 
-    Authorize.set_access_cookies(access_token)
-    Authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "Successfully login"}
+    # subject identifier for who this token is for example id or username from database
+    #access_token = Authorize.create_access_token(subject=user.username)
+    #refresh_token = Authorize.create_refresh_token(subject=user.username)
+    # Call pair creation
+    pair_token = Authorize.create_pair_token(subject=user.username, fresh=True)
+
+    # Set the JWT cookies in the response
+    #Authorize.set_access_cookies(access_token)
+    #Authorize.set_refresh_cookies(refresh_token)
+    Authorize.set_pair_cookies(pair_token)
+    
+    #return {"tokens": access_token, "msg": "Successful login. Refresh token set as cookie. :)"}
+    return {"tokens": pair_token, "msg": "Successful login. Access and Refresh token set as cookies. :)"}
+

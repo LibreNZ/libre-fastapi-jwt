@@ -41,10 +41,10 @@ def test_default_config():
     assert int(AuthJWT._access_token_expires.total_seconds()) == 900
 
     assert AuthJWT._refresh_token_expires.__class__ == timedelta
-    assert int(AuthJWT._refresh_token_expires.total_seconds()) == 2592000
+    assert int(AuthJWT._refresh_token_expires.total_seconds()) == 1209600
     # option for create cookies
-    assert AuthJWT._access_cookie_key == "access_token_cookie"
-    assert AuthJWT._refresh_cookie_key == "refresh_token_cookie"
+    assert AuthJWT._access_cookie_key == "__Host-access_token"
+    assert AuthJWT._refresh_cookie_key == "__Host-refresh_token"
     assert AuthJWT._access_cookie_path == "/"
     assert AuthJWT._refresh_cookie_path == "/"
     assert AuthJWT._cookie_max_age is None
@@ -53,8 +53,8 @@ def test_default_config():
     assert AuthJWT._cookie_samesite is None
     # option for double submit csrf protection
     assert AuthJWT._cookie_csrf_protect is True
-    assert AuthJWT._access_csrf_cookie_key == "csrf_access_token"
-    assert AuthJWT._refresh_csrf_cookie_key == "csrf_refresh_token"
+    assert AuthJWT._access_csrf_cookie_key == "__Host-CSRF_access"
+    assert AuthJWT._refresh_csrf_cookie_key == "__Host-CSRF_refresh"
     assert AuthJWT._access_csrf_cookie_path == "/"
     assert AuthJWT._refresh_csrf_cookie_path == "/"
     assert AuthJWT._access_csrf_header_name == "X-CSRF-Token"
@@ -158,8 +158,8 @@ def test_load_env_from_outside():
         authjwt_access_token_expires: timedelta = timedelta(minutes=2)
         authjwt_refresh_token_expires: timedelta = timedelta(days=5)
         # option for create cookies
-        authjwt_access_cookie_key: str = "access_cookie"
-        authjwt_refresh_cookie_key: str = "refresh_cookie"
+        authjwt_access_cookie_key: str = "__Host-access_token"
+        authjwt_refresh_cookie_key: str = "__Host-refresh_token"
         authjwt_access_cookie_path: str = "/access-cookie"
         authjwt_refresh_cookie_path: str = "/refresh-cookie"
         authjwt_cookie_max_age: int = 90
@@ -202,8 +202,8 @@ def test_load_env_from_outside():
     assert AuthJWT._access_token_expires == timedelta(minutes=2)
     assert AuthJWT._refresh_token_expires == timedelta(days=5)
     # option for create cookies
-    assert AuthJWT._access_cookie_key == "access_cookie"
-    assert AuthJWT._refresh_cookie_key == "refresh_cookie"
+    assert AuthJWT._access_cookie_key == "__Host-access_token"
+    assert AuthJWT._refresh_cookie_key == "__Host-refresh_token"
     assert AuthJWT._access_cookie_path == "/access-cookie"
     assert AuthJWT._refresh_cookie_path == "/refresh-cookie"
     assert AuthJWT._cookie_max_age == 90

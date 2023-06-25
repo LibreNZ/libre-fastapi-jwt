@@ -2,10 +2,10 @@
 :   Enable/disable CSRF protection when using cookies. Defaults to `True`
 
 `authjwt_access_csrf_cookie_key`
-:   Key of the CSRF access cookie. Defaults to `'csrf_access_token'`
+:   Key of the CSRF access cookie. Defaults to `'__Host-CSRF_access'`
 
 `authjwt_refresh_csrf_cookie_key`
-:   Key of the CSRF refresh cookie. Defaults to `'csrf_refresh_token'`
+:   Key of the CSRF refresh cookie. Defaults to `'__Host-CSRF_refresh'`
 
 `authjwt_access_csrf_cookie_path`
 :   Path for the CSRF access cookie. Defaults to `'/'`

@@ -8,7 +8,7 @@ Here is a basic example of how to store JWT in cookies:
 
     ``` python
     ...
-    response = JSONResponse(content={"msg":"Successfully login"})
+    response = JSONResponse(content={"msg":"Successful login"})
     # Set the JWT and CSRF double submit cookies in the response
     Authorize.set_access_cookies(access_token,response)
     Authorize.set_refresh_cookies(refresh_token,response)

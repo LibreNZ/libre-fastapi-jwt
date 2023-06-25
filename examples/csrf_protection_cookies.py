@@ -5,9 +5,9 @@ from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 """
-By default, the CRSF cookies will be called csrf_access_token and
-csrf_refresh_token, and in protected endpoints we will look
-for the CSRF token in the 'X-CSRF-Token' headers. only certain
+By default, the CRSF cookies will be called '__Host-CSRF_access' and
+'__Host-CSRF_refresh', and in protected endpoints we will look
+for the CSRF token in the 'X-CSRF-Token' headers. only state change
 methods should define CSRF token in headers default is ('POST','PUT','PATCH','DELETE')
 """
 
@@ -57,7 +57,7 @@ def login(user: User, Authorize: AuthJWT = Depends()):
     # Set the JWT and CSRF double submit cookies in the response
     Authorize.set_access_cookies(access_token)
     Authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "Successfully login"}
+    return {"msg": "Successful login"}
 
 
 @app.post("/refresh")
@@ -81,7 +81,7 @@ def logout(Authorize: AuthJWT = Depends()):
     Authorize.jwt_required()
 
     Authorize.unset_jwt_cookies()
-    return {"msg": "Successfully logout"}
+    return {"msg": "Successful logout"}
 
 
 @app.get("/protected")

@@ -23,11 +23,11 @@ class AuthConfig:
     _header_type = "Bearer"
     _token_in_denylist_callback = None
     _access_token_expires = timedelta(minutes=15)
-    _refresh_token_expires = timedelta(days=30)
+    _refresh_token_expires = timedelta(days=14)
 
     # option for create cookies
-    _access_cookie_key = "access_token_cookie"
-    _refresh_cookie_key = "refresh_token_cookie"
+    _access_cookie_key = "__Host-access_token"
+    _refresh_cookie_key = "__Host-refresh_token"
     _access_cookie_path = "/"
     _refresh_cookie_path = "/"
     _cookie_max_age = None
@@ -37,8 +37,8 @@ class AuthConfig:
 
     # option for double submit csrf protection
     _cookie_csrf_protect = True
-    _access_csrf_cookie_key = "csrf_access_token"
-    _refresh_csrf_cookie_key = "csrf_refresh_token"
+    _access_csrf_cookie_key = "__Host-CSRF_access"
+    _refresh_csrf_cookie_key = "__Host-CSRF_refresh"
     _access_csrf_cookie_path = "/"
     _refresh_csrf_cookie_path = "/"
     _access_csrf_header_name = "X-CSRF-Token"
