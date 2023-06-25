@@ -1,3 +1,7 @@
+## 0.20.5
+* Removed unused variable
+* Made `set_pair_cookies()` to merge user_claim Dict instead of relying on default value
+* Removed Python 3.8 from support due to the above Dict merge method
 ## 0.20.4
 * Upgraded cookie defaults to "safer" ones
 * `set_pair_cookies()` now 1st class citizen (though need to sort out user_claims still)

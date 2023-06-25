@@ -203,9 +203,6 @@ class AuthJWT(AuthConfig):
             "refresh": self._refresh_token_type,
         }
 
-        # TODO: Check if we still need this (ToroNZ)
-        # custom_claims = {"type_token": type_token}
-
         if self._token_type_claim:
             custom_claims = {self._token_type_claim_name: token_types[type_token]}
         else:
@@ -364,7 +361,7 @@ class AuthJWT(AuthConfig):
         headers: Optional[Dict] = None,
         expires_time: Optional[Union[timedelta, int, bool]] = None,
         audience: Optional[Union[str, Sequence[str]]] = None,
-        user_claims: Optional[Dict] = {"aid": str(uuid4())},
+        user_claims: Optional[Dict] = {},
     ) -> str:
         """
         Create a refresh token with X days for expired time (default),
@@ -372,6 +369,8 @@ class AuthJWT(AuthConfig):
 
         :return: hash token
         """
+        # Create a unique identifier to allow consumers to associate both tokens created as pair
+        pair_identifier = {"aid": str(uuid4())}
 
         refresh = self._create_token(
             subject=subject,
@@ -380,7 +379,7 @@ class AuthJWT(AuthConfig):
             algorithm=algorithm,
             headers=headers,
             audience=audience,
-            user_claims=user_claims,
+            user_claims=user_claims | pair_identifier,
         )
         access = self._create_token(
             subject=subject,
@@ -390,7 +389,7 @@ class AuthJWT(AuthConfig):
             algorithm=algorithm,
             headers=headers,
             audience=audience,
-            user_claims=user_claims,
+            user_claims=user_claims | pair_identifier,
             issuer=self._encode_issuer,
         )
         return {"access_token": access, "refresh_token": refresh}
