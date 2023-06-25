@@ -42,7 +42,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
 
-# provide a method to create access tokens. The create_access_token()
+# provide a method to create access tokens. The create_<type>_token()
 # function is used to actually generate the token to use authorization
 # later in endpoint protected
 @app.post("/login")

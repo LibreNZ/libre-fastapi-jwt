@@ -6,6 +6,9 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
+class User(BaseModel):
+    username: str
+    password: str
 
 class Settings(BaseModel):
     authjwt_secret_key: str = "secret"
@@ -76,11 +79,25 @@ async def websocket(
         await websocket.close()
 
 
-@app.get("/get-cookie")
-def get_cookie(Authorize: AuthJWT = Depends()):
-    access_token = Authorize.create_access_token(subject="test", fresh=True)
-    refresh_token = Authorize.create_refresh_token(subject="test")
+# provide a method to create access tokens. The create_<type>_token()
+# function is used to actually generate the token to use authorization
+# later in endpoint protected
+@app.post("/login")
+def login(user: User, Authorize: AuthJWT = Depends()):
+    if user.username != "test" or user.password != "test":
+        raise HTTPException(status_code=401, detail="Bad username or password")
 
-    Authorize.set_access_cookies(access_token)
-    Authorize.set_refresh_cookies(refresh_token)
-    return {"msg": "Successful login"}
+    # subject identifier for who this token is for example id or username from database
+    #access_token = Authorize.create_access_token(subject=user.username)
+    #refresh_token = Authorize.create_refresh_token(subject=user.username)
+    # Call pair creation
+    pair_token = Authorize.create_pair_token(subject=user.username, fresh=True)
+
+    # Set the JWT cookies in the response
+    #Authorize.set_access_cookies(access_token)
+    #Authorize.set_refresh_cookies(refresh_token)
+    Authorize.set_pair_cookies(pair_token)
+    
+    #return {"tokens": access_token, "msg": "Successful login. Refresh token set as cookie. :)"}
+    return {"tokens": pair_token, "msg": "Successful login. Access and Refresh token set as cookies. :)"}
+
