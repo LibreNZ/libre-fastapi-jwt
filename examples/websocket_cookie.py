@@ -39,7 +39,7 @@ html = """
             }
 
             const websocketfun = () => {
-                let csrf_token = getCookie("__Host-CSRF_access")
+                let csrf_token = getCookie("csrf_access")
 
                 let ws = new WebSocket(`ws://localhost:8000/ws?csrf_token=${csrf_token}`)
                 ws.onmessage = (event) => {

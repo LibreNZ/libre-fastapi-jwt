@@ -57,8 +57,8 @@ def test_get_subject_through_cookie_or_headers(url, client):
     access_token = res.json()["access"]
     refresh_token = res.json()["refresh"]
 
-    access_csrf = res.cookies.get("__Host-CSRF_access")
-    refresh_csrf = res.cookies.get("__Host-CSRF_refresh")
+    access_csrf = res.cookies.get("csrf_access")
+    refresh_csrf = res.cookies.get("csrf_refresh")
 
     # access through headers
     if url != "/jwt-refresh":

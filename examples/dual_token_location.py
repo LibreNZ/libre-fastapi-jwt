@@ -23,8 +23,8 @@ class Settings(BaseModel):
     authjwt_cookie_samesite: str = "strict"
     authjwt_cookie_max_age: int = 604800 # 7 days = 604800 seconds
     authjwt_refresh_token_expires: timedelta = timedelta(days=14)
-    authjwt_access_csrf_cookie_key: str = "__Host-CSRF_access"
-    authjwt_refresh_csrf_cookie_key: str = "__Host-CSRF_refresh"
+    authjwt_access_csrf_cookie_key: str = "csrf_access"
+    authjwt_refresh_csrf_cookie_key: str = "csrf_refresh"
     authjwt_access_csrf_header_name: str = "X-Libre-AccessToken"
     authjwt_refresh_csrf_header_name: str = "X-Libre-RefreshToken"
 

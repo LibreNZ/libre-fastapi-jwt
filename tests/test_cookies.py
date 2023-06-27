@@ -213,18 +213,18 @@ def test_unset_all_cookie(client):
 
     response = client.get("/all-token")
     assert response.cookies.get("__Host-access_token") is not None
-    assert response.cookies.get("__Host-CSRF_access") is not None
+    assert response.cookies.get("csrf_access") is not None
 
     assert response.cookies.get("__Host-refresh_token") is not None
-    assert response.cookies.get("__Host-CSRF_refresh") is not None
+    assert response.cookies.get("csrf_refresh") is not None
 
     response = client.get("/unset-all-token")
 
     assert response.cookies.get("__Host-access_token") is None
-    assert response.cookies.get("__Host-CSRF_access") is None
+    assert response.cookies.get("csrf_access") is None
 
     assert response.cookies.get("__Host-refresh_token") is None
-    assert response.cookies.get("__Host-CSRF_refresh") is None
+    assert response.cookies.get("csrf_refresh") is None
 
 
 def test_unset_all_cookie_response(client):
@@ -237,18 +237,18 @@ def test_unset_all_cookie_response(client):
 
     response = client.get("/all-token-response")
     assert response.cookies.get("__Host-access_token") is not None
-    assert response.cookies.get("__Host-CSRF_access") is not None
+    assert response.cookies.get("csrf_access") is not None
 
     assert response.cookies.get("__Host-refresh_token") is not None
-    assert response.cookies.get("__Host-CSRF_refresh") is not None
+    assert response.cookies.get("csrf_refresh") is not None
 
     response = client.get("/unset-all-token-response")
 
     assert response.cookies.get("__Host-access_token") is None
-    assert response.cookies.get("__Host-CSRF_access") is None
+    assert response.cookies.get("csrf_access") is None
 
     assert response.cookies.get("__Host-refresh_token") is None
-    assert response.cookies.get("__Host-CSRF_refresh") is None
+    assert response.cookies.get("csrf_refresh") is None
 
 
 def test_custom_cookie_key(client):
@@ -336,7 +336,7 @@ def test_cookie_optional_protected(client):
         ]
 
     res = client.get("/access-token")
-    csrf_token = res.cookies.get("__Host-CSRF_access")
+    csrf_token = res.cookies.get("csrf_access")
 
     response = client.post(url)
     assert response.status_code == 401
@@ -388,7 +388,7 @@ def test_cookie_optional_protected(client):
         ]
 
     res = client.get("/access-token")
-    csrf_token = res.cookies.get("__Host-CSRF_access")
+    csrf_token = res.cookies.get("csrf_access")
 
     # valid request
     response = client.post(url, headers={"X-CSRF": csrf_token})
@@ -412,8 +412,8 @@ def test_cookie_protected(url, client):
         ]
 
     res = client.get("/all-token")
-    csrf_access = res.cookies.get("__Host-CSRF_access")
-    csrf_refresh = res.cookies.get("__Host-CSRF_refresh")
+    csrf_access = res.cookies.get("csrf_access")
+    csrf_refresh = res.cookies.get("csrf_refresh")
 
     if url != "/jwt-refresh":
         response = client.post(url, headers={"X-CSRF-Access": csrf_access})
@@ -482,8 +482,8 @@ def test_cookie_protected(url, client):
 
     # csrf token do not match
     res = client.get("/all-token")
-    csrf_access = res.cookies.get("__Host-CSRF_access")
-    csrf_refresh = res.cookies.get("__Host-CSRF_refresh")
+    csrf_access = res.cookies.get("csrf_access")
+    csrf_refresh = res.cookies.get("csrf_refresh")
 
     response = client.post(url, headers={"X-CSRF-Token": "invalid"})
     assert response.status_code == 401

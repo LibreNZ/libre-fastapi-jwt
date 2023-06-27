@@ -5,8 +5,8 @@ from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 """
-By default, the CRSF cookies will be called '__Host-CSRF_access' and
-'__Host-CSRF_refresh', and in protected endpoints we will look
+By default, the CRSF cookies will be called 'csrf_access' and
+'csrf_refresh', and in protected endpoints we will look
 for the CSRF token in the 'X-CSRF-Token' headers. only state change
 methods should define CSRF token in headers default is ('POST','PUT','PATCH','DELETE')
 """

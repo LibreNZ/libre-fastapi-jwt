@@ -53,8 +53,8 @@ def test_default_config():
     assert AuthJWT._cookie_samesite is None
     # option for double submit csrf protection
     assert AuthJWT._cookie_csrf_protect is True
-    assert AuthJWT._access_csrf_cookie_key == "__Host-CSRF_access"
-    assert AuthJWT._refresh_csrf_cookie_key == "__Host-CSRF_refresh"
+    assert AuthJWT._access_csrf_cookie_key == "csrf_access"
+    assert AuthJWT._refresh_csrf_cookie_key == "csrf_refresh"
     assert AuthJWT._access_csrf_cookie_path == "/"
     assert AuthJWT._refresh_csrf_cookie_path == "/"
     assert AuthJWT._access_csrf_header_name == "X-CSRF-Token"

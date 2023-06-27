@@ -37,8 +37,8 @@ class AuthConfig:
 
     # option for double submit csrf protection
     _cookie_csrf_protect = True
-    _access_csrf_cookie_key = "__Host-CSRF_access"
-    _refresh_csrf_cookie_key = "__Host-CSRF_refresh"
+    _access_csrf_cookie_key = "csrf_access"
+    _refresh_csrf_cookie_key = "csrf_refresh"
     _access_csrf_cookie_path = "/"
     _refresh_csrf_cookie_path = "/"
     _access_csrf_header_name = "X-CSRF-Token"
