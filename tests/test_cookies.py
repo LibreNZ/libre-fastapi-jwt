@@ -178,7 +178,7 @@ def test_set_cookie_csrf_protect_false(url, client):
 
     cookie_key = url.split("-")[0][1:]
     response = client.get(url)
-    assert response.cookies.get("__Host-CSRF_{}".format(cookie_key)) is None
+    assert response.cookies.get("csrf_{}".format(cookie_key)) is None
 
 
 @pytest.mark.parametrize(
@@ -200,7 +200,7 @@ def test_set_cookie_csrf_protect_true(url, client):
 
     cookie_key = url.split("-")[0][1:]
     response = client.get(url)
-    assert response.cookies.get("__Host-CSRF_{}".format(cookie_key)) is not None
+    assert response.cookies.get("csrf_{}".format(cookie_key)) is not None
 
 
 def test_unset_all_cookie(client):
