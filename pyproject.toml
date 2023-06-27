@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 PyJWT = "^2.6.0"
 fastapi = ">=0.95.1"
 cryptography = ">=41.0.0"

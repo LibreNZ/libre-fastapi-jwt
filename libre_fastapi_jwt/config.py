@@ -34,11 +34,11 @@ class LoadConfig(BaseModel):
     authjwt_cookie_max_age: Optional[StrictInt] = 86400
     authjwt_cookie_domain: Optional[StrictStr] = None
     authjwt_cookie_secure: Optional[StrictBool] = True
-    authjwt_cookie_samesite: Optional[StrictStr] = "Lax"
+    authjwt_cookie_samesite: Optional[StrictStr] = "lax"
     # option for double submit csrf protection
     authjwt_cookie_csrf_protect: Optional[StrictBool] = True
-    authjwt_access_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_access"
-    authjwt_refresh_csrf_cookie_key: Optional[StrictStr] = "__Host-CSRF_refresh"
+    authjwt_access_csrf_cookie_key: Optional[StrictStr] = "csrf_access"
+    authjwt_refresh_csrf_cookie_key: Optional[StrictStr] = "csrf_refresh"
     authjwt_access_csrf_cookie_path: Optional[StrictStr] = "/"
     authjwt_refresh_csrf_cookie_path: Optional[StrictStr] = "/"
     authjwt_access_csrf_header_name: Optional[StrictStr] = "X-CSRF-Token"
