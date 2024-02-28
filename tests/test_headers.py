@@ -1,11 +1,11 @@
 import pytest
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from fastapi import FastAPI, Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
 from typing import Optional
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 @pytest.fixture(scope="function")
@@ -14,9 +14,7 @@ def client():
 
     @app.exception_handler(AuthJWTException)
     def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-        return JSONResponse(
-            status_code=exc.status_code, content={"detail": exc.message}
-        )
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
     @app.get("/protected")
     def protected(Authorize: AuthJWT = Depends()):
@@ -40,29 +38,21 @@ def client():
 def test_header_without_jwt(client):
     response = client.get("/protected", headers={"Authorization": "Bearer"})
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"
-    }
+    assert response.json() == {"detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"}
 
     response = client.get("/protected", headers={"Authorization": "Bearer "})
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"
-    }
+    assert response.json() == {"detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"}
 
 
 def test_header_without_bearer(client):
     response = client.get("/protected", headers={"Authorization": "Test asd"})
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"
-    }
+    assert response.json() == {"detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"}
 
     response = client.get("/protected", headers={"Authorization": "Test "})
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"
-    }
+    assert response.json() == {"detail": "Bad Authorization header. Expected value 'Bearer <JWT>'"}
 
 
 def test_header_invalid_jwt(client):
@@ -80,12 +70,8 @@ def test_valid_header(client, Authorize):
 
 def test_jwt_custom_headers(Authorize):
     access_token = Authorize.create_access_token(subject=1, headers={"access": "bar"})
-    refresh_token = Authorize.create_refresh_token(
-        subject=2, headers={"refresh": "foo"}
-    )
-    pair_token = Authorize.create_access_token(
-        subject=1, headers={"access": "bar", "refresh": "foo"}
-    )
+    refresh_token = Authorize.create_refresh_token(subject=2, headers={"refresh": "foo"})
+    pair_token = Authorize.create_access_token(subject=1, headers={"access": "bar", "refresh": "foo"})
 
     assert Authorize.get_unverified_jwt_headers(access_token)["access"] == "bar"
     assert Authorize.get_unverified_jwt_headers(refresh_token)["refresh"] == "foo"
@@ -96,18 +82,12 @@ def test_jwt_custom_headers(Authorize):
 
 def test_get_jwt_headers_from_request(client, Authorize):
     access_token = Authorize.create_access_token(subject=1, headers={"access": "bar"})
-    refresh_token = Authorize.create_refresh_token(
-        subject=2, headers={"refresh": "foo"}
-    )
+    refresh_token = Authorize.create_refresh_token(subject=2, headers={"refresh": "foo"})
 
-    response = client.get(
-        "/get_headers_access", headers={"Authorization": f"Bearer {access_token}"}
-    )
+    response = client.get("/get_headers_access", headers={"Authorization": f"Bearer {access_token}"})
     assert response.json()["access"] == "bar"
 
-    response = client.get(
-        "/get_headers_refresh", headers={"Authorization": f"Bearer {refresh_token}"}
-    )
+    response = client.get("/get_headers_refresh", headers={"Authorization": f"Bearer {refresh_token}"})
     assert response.json()["refresh"] == "foo"
 
 
@@ -134,9 +114,7 @@ def test_custom_header_name(client, Authorize):
     # Invalid headers
     response = client.get("/protected", headers={"Foo": "Bearer test test"})
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Bad Foo header. Expected value 'Bearer <JWT>'"
-    }
+    assert response.json() == {"detail": "Bad Foo header. Expected value 'Bearer <JWT>'"}
 
     AuthJWT._header_name = "Authorization"
 
@@ -154,9 +132,7 @@ def test_custom_header_type(client, Authorize):
     # Insure 'default' headers no longer work
     response = client.get("/protected", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Bad Authorization header. Expected value 'JWT <JWT>'"
-    }
+    assert response.json() == {"detail": "Bad Authorization header. Expected value 'JWT <JWT>'"}
     # Insure new headers do work
     response = client.get("/protected", headers={"Authorization": f"JWT {token}"})
     assert response.status_code == 200
@@ -173,9 +149,7 @@ def test_custom_header_type(client, Authorize):
     # Insure 'JWT' headers no longer work
     response = client.get("/protected", headers={"Authorization": f"JWT {token}"})
     assert response.status_code == 422
-    assert response.json() == {
-        "detail": "Bad Authorization header. Expected value '<JWT>'"
-    }
+    assert response.json() == {"detail": "Bad Authorization header. Expected value '<JWT>'"}
     # Insure new headers without a type also work
     response = client.get("/protected", headers={"Authorization": f"{token}"})
     assert response.status_code == 200

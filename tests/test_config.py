@@ -1,10 +1,11 @@
 import pytest, os, jwt
-from libre_fastapi_jwt import AuthJWT
+from fastapi_jwt2 import AuthJWT
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
-from pydantic import BaseSettings, ValidationError
+from pydantic import ValidationError
 from typing import Sequence, Optional
 from datetime import timedelta
+from pydantic_settings import BaseSettings
 
 
 @pytest.fixture(scope="function")
@@ -43,8 +44,8 @@ def test_default_config():
     assert AuthJWT._refresh_token_expires.__class__ == timedelta
     assert int(AuthJWT._refresh_token_expires.total_seconds()) == 1209600
     # option for create cookies
-    assert AuthJWT._access_cookie_key == "__Host-access_token"
-    assert AuthJWT._refresh_cookie_key == "__Host-refresh_token"
+    assert AuthJWT._access_cookie_key == "access_token"
+    assert AuthJWT._refresh_cookie_key == "refresh_token"
     assert AuthJWT._access_cookie_path == "/"
     assert AuthJWT._refresh_cookie_path == "/"
     assert AuthJWT._cookie_max_age is None
@@ -158,8 +159,8 @@ def test_load_env_from_outside():
         authjwt_access_token_expires: timedelta = timedelta(minutes=2)
         authjwt_refresh_token_expires: timedelta = timedelta(days=5)
         # option for create cookies
-        authjwt_access_cookie_key: str = "__Host-access_token"
-        authjwt_refresh_cookie_key: str = "__Host-refresh_token"
+        authjwt_access_cookie_key: str = "access_token"
+        authjwt_refresh_cookie_key: str = "refresh_token"
         authjwt_access_cookie_path: str = "/access-cookie"
         authjwt_refresh_cookie_path: str = "/refresh-cookie"
         authjwt_cookie_max_age: int = 90
@@ -185,7 +186,7 @@ def test_load_env_from_outside():
     def get_valid_settings():
         return Settings()
 
-    assert AuthJWT._token_location == ["cookies"]
+    assert AuthJWT._token_location == {"cookies"}
     assert AuthJWT._secret_key == "testing"
     assert AuthJWT._public_key == PUBLIC_KEY
     assert AuthJWT._private_key == PRIVATE_KEY
@@ -195,15 +196,15 @@ def test_load_env_from_outside():
     assert AuthJWT._encode_issuer == "urn:foo"
     assert AuthJWT._decode_issuer == "urn:foo"
     assert AuthJWT._decode_audience == "urn:foo"
-    assert AuthJWT._denylist_token_checks == ["refresh"]
+    assert AuthJWT._denylist_token_checks == {"refresh"}
     assert AuthJWT._denylist_enabled is False
     assert AuthJWT._header_name == "Auth-Token"
     assert AuthJWT._header_type is None
     assert AuthJWT._access_token_expires == timedelta(minutes=2)
     assert AuthJWT._refresh_token_expires == timedelta(days=5)
     # option for create cookies
-    assert AuthJWT._access_cookie_key == "__Host-access_token"
-    assert AuthJWT._refresh_cookie_key == "__Host-refresh_token"
+    assert AuthJWT._access_cookie_key == "access_token"
+    assert AuthJWT._refresh_cookie_key == "refresh_token"
     assert AuthJWT._access_cookie_path == "/access-cookie"
     assert AuthJWT._refresh_cookie_path == "/refresh-cookie"
     assert AuthJWT._cookie_max_age == 90
@@ -218,7 +219,7 @@ def test_load_env_from_outside():
     assert AuthJWT._refresh_csrf_cookie_path == "/refresh-csrf"
     assert AuthJWT._access_csrf_header_name == "ACCESS-CSRF-Token"
     assert AuthJWT._refresh_csrf_header_name == "REFRESH-CSRF-Token"
-    assert AuthJWT._csrf_methods == ["POST"]
+    assert AuthJWT._csrf_methods == {"POST"}
     # options to adjust token's type claim
     assert AuthJWT._token_type_claim
     assert AuthJWT._access_token_type == "access"

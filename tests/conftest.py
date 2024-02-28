@@ -1,6 +1,6 @@
 import pytest
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.config import LoadConfig
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.config import LoadConfig
 
 
 @pytest.fixture(scope="module")

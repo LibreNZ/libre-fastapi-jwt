@@ -1,7 +1,7 @@
 import pytest, jwt
-from libre_fastapi_jwt import AuthJWT
-from pydantic import BaseSettings
+from fastapi_jwt2 import AuthJWT
 from datetime import timedelta, datetime, timezone
+from pydantic_settings import BaseSettings
 
 
 @pytest.fixture()
@@ -99,47 +99,29 @@ def test_create_dynamic_refresh_token_expires(Authorize, test_settings):
 def test_create_dynamic_pair_token_expires(Authorize, test_settings):
     expires_time = int(datetime.now(timezone.utc).timestamp()) + 90
     token = Authorize.create_pair_token(subject=1, expires_time=90)
-    assert_access_token = (
-        jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time
-    )
-    assert_refresh_token = (
-        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time
-    )
+    assert_access_token = jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"] == expires_time
+    assert_refresh_token = jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"] == expires_time
     assert assert_access_token and assert_refresh_token
 
     expires_time = int(datetime.now(timezone.utc).timestamp()) + 86400
     token = Authorize.create_pair_token(subject=1, expires_time=timedelta(days=1))
-    assert_access_token = (
-        jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time
-    )
-    assert_refresh_token = (
-        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time
-    )
+    assert_access_token = jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"] == expires_time
+    assert_refresh_token = jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"] == expires_time
     assert assert_access_token and assert_refresh_token
 
     # Set different timestamps to test both token types
     expires_time_access = int(datetime.now(timezone.utc).timestamp()) + 2
     expires_time_refresh = int(datetime.now(timezone.utc).timestamp()) + 4
     token = Authorize.create_pair_token(subject=1, expires_time=True)
-    assert_access_token = (
-        jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time_access
-    )
+    assert_access_token = jwt.decode(token["access_token"], "testing", algorithms="HS256")["exp"] == expires_time_access
     assert_refresh_token = (
-        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"]
-        == expires_time_refresh
+        jwt.decode(token["refresh_token"], "testing", algorithms="HS256")["exp"] == expires_time_refresh
     )
     assert assert_access_token and assert_refresh_token
 
     token = Authorize.create_pair_token(subject=1, expires_time=False)
     assert "exp" not in jwt.decode(token["access_token"], "testing", algorithms="HS256")
-    assert "exp" not in jwt.decode(
-        token["refresh_token"], "testing", algorithms="HS256"
-    )
+    assert "exp" not in jwt.decode(token["refresh_token"], "testing", algorithms="HS256")
 
     with pytest.raises(TypeError, match=r"expires_time"):
         Authorize.create_pair_token(subject=1, expires_time="test")
@@ -177,32 +159,11 @@ def test_create_token_invalid_user_claims(Authorize, test_settings):
 
 
 def test_create_valid_user_claims(Authorize, test_settings):
-    access_token = Authorize.create_access_token(
-        subject=1, user_claims={"my_access": "yeah"}
-    )
-    refresh_token = Authorize.create_refresh_token(
-        subject=1, user_claims={"my_refresh": "hello"}
-    )
-    pair_token = Authorize.create_pair_token(
-        subject=1, user_claims={"my_access": "yeah", "my_refresh": "hello"}
-    )
+    access_token = Authorize.create_access_token(subject=1, user_claims={"my_access": "yeah"})
+    refresh_token = Authorize.create_refresh_token(subject=1, user_claims={"my_refresh": "hello"})
+    pair_token = Authorize.create_pair_token(subject=1, user_claims={"my_access": "yeah", "my_refresh": "hello"})
 
-    assert (
-        jwt.decode(access_token, "testing", algorithms="HS256")["my_access"] == "yeah"
-    )
-    assert (
-        jwt.decode(refresh_token, "testing", algorithms="HS256")["my_refresh"]
-        == "hello"
-    )
-    assert (
-        jwt.decode(pair_token["access_token"], "testing", algorithms="HS256")[
-            "my_access"
-        ]
-        == "yeah"
-    )
-    assert (
-        jwt.decode(pair_token["refresh_token"], "testing", algorithms="HS256")[
-            "my_refresh"
-        ]
-        == "hello"
-    )
+    assert jwt.decode(access_token, "testing", algorithms="HS256")["my_access"] == "yeah"
+    assert jwt.decode(refresh_token, "testing", algorithms="HS256")["my_refresh"] == "hello"
+    assert jwt.decode(pair_token["access_token"], "testing", algorithms="HS256")["my_access"] == "yeah"
+    assert jwt.decode(pair_token["refresh_token"], "testing", algorithms="HS256")["my_refresh"] == "hello"

@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from pydantic import BaseModel
 from datetime import timedelta
 from redis import Redis
@@ -37,6 +37,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 # Setup our redis connection for storing the denylist tokens
 redis_conn = Redis(host="localhost", port=6379, db=0, decode_responses=True)
+
 
 # Create our function to check if a token has been revoked. In this simple
 # case, we will just store the tokens jti (unique identifier) in redis.

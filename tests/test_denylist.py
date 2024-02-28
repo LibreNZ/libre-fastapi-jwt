@@ -1,6 +1,6 @@
 import pytest
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from fastapi import FastAPI, Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
@@ -22,9 +22,7 @@ def client():
 
     @app.exception_handler(AuthJWTException)
     def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-        return JSONResponse(
-            status_code=exc.status_code, content={"detail": exc.message}
-        )
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
     @app.get("/jwt-required")
     def jwt_required(Authorize: AuthJWT = Depends()):
@@ -60,9 +58,7 @@ def refresh_token(Authorize):
     return Authorize.create_refresh_token(subject="test")
 
 
-@pytest.mark.parametrize(
-    "url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"]
-)
+@pytest.mark.parametrize("url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"])
 def test_non_denylisted_access_token(client, url, access_token, Authorize):
     response = client.get(url, headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 200
@@ -85,9 +81,7 @@ def test_non_denylisted_refresh_token(client, refresh_token, Authorize):
     denylist.add(jti)
 
 
-@pytest.mark.parametrize(
-    "url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"]
-)
+@pytest.mark.parametrize("url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"])
 def test_denylisted_access_token(client, url, access_token):
     response = client.get(url, headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 401

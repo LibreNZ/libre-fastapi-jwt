@@ -1,14 +1,16 @@
 from fastapi import FastAPI, WebSocket, Depends, Query
 from fastapi.responses import HTMLResponse
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 app = FastAPI()
 
+
 class User(BaseModel):
     username: str
     password: str
+
 
 class Settings(BaseModel):
     authjwt_secret_key: str = "secret"
@@ -62,9 +64,7 @@ async def get():
 
 
 @app.websocket("/ws")
-async def websocket(
-    websocket: WebSocket, csrf_token: str = Query(...), Authorize: AuthJWT = Depends()
-):
+async def websocket(websocket: WebSocket, csrf_token: str = Query(...), Authorize: AuthJWT = Depends()):
     await websocket.accept()
     try:
         Authorize.jwt_required("websocket", websocket=websocket, csrf_token=csrf_token)
@@ -88,16 +88,15 @@ def login(user: User, Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=401, detail="Bad username or password")
 
     # subject identifier for who this token is for example id or username from database
-    #access_token = Authorize.create_access_token(subject=user.username)
-    #refresh_token = Authorize.create_refresh_token(subject=user.username)
+    # access_token = Authorize.create_access_token(subject=user.username)
+    # refresh_token = Authorize.create_refresh_token(subject=user.username)
     # Call pair creation
     pair_token = Authorize.create_pair_token(subject=user.username, fresh=True)
 
     # Set the JWT cookies in the response
-    #Authorize.set_access_cookies(access_token)
-    #Authorize.set_refresh_cookies(refresh_token)
+    # Authorize.set_access_cookies(access_token)
+    # Authorize.set_refresh_cookies(refresh_token)
     Authorize.set_pair_cookies(pair_token)
-    
-    #return {"tokens": access_token, "msg": "Successful login. Refresh token set as cookie. :)"}
-    return {"tokens": pair_token, "msg": "Successful login. Access and Refresh token set as cookies. :)"}
 
+    # return {"tokens": access_token, "msg": "Successful login. Refresh token set as cookie. :)"}
+    return {"tokens": pair_token, "msg": "Successful login. Access and Refresh token set as cookies. :)"}

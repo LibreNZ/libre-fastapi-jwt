@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -34,12 +34,8 @@ def login(user: User, Authorize: AuthJWT = Depends()):
         raise HTTPException(status_code=401, detail="Bad username or password")
 
     # You can define different algorithm when create a token
-    access_token = Authorize.create_access_token(
-        subject=user.username, algorithm="HS384"
-    )
-    refresh_token = Authorize.create_refresh_token(
-        subject=user.username, algorithm="HS512"
-    )
+    access_token = Authorize.create_access_token(subject=user.username, algorithm="HS384")
+    refresh_token = Authorize.create_refresh_token(subject=user.username, algorithm="HS512")
     return {"access_token": access_token, "refresh_token": refresh_token}
 
 

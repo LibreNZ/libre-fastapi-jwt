@@ -1,6 +1,6 @@
 import pytest
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
@@ -12,9 +12,7 @@ def client():
 
     @app.exception_handler(AuthJWTException)
     def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-        return JSONResponse(
-            status_code=exc.status_code, content={"detail": exc.message}
-        )
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
     @app.get("/all-token")
     def all_token(Authorize: AuthJWT = Depends()):
@@ -212,18 +210,18 @@ def test_unset_all_cookie(client):
         ]
 
     response = client.get("/all-token")
-    assert response.cookies.get("__Host-access_token") is not None
+    assert response.cookies.get("access_token") is not None
     assert response.cookies.get("csrf_access") is not None
 
-    assert response.cookies.get("__Host-refresh_token") is not None
+    assert response.cookies.get("refresh_token") is not None
     assert response.cookies.get("csrf_refresh") is not None
 
     response = client.get("/unset-all-token")
 
-    assert response.cookies.get("__Host-access_token") is None
+    assert response.cookies.get("access_token") is None
     assert response.cookies.get("csrf_access") is None
 
-    assert response.cookies.get("__Host-refresh_token") is None
+    assert response.cookies.get("refresh_token") is None
     assert response.cookies.get("csrf_refresh") is None
 
 
@@ -236,18 +234,18 @@ def test_unset_all_cookie_response(client):
         ]
 
     response = client.get("/all-token-response")
-    assert response.cookies.get("__Host-access_token") is not None
+    assert response.cookies.get("access_token") is not None
     assert response.cookies.get("csrf_access") is not None
 
-    assert response.cookies.get("__Host-refresh_token") is not None
+    assert response.cookies.get("refresh_token") is not None
     assert response.cookies.get("csrf_refresh") is not None
 
     response = client.get("/unset-all-token-response")
 
-    assert response.cookies.get("__Host-access_token") is None
+    assert response.cookies.get("access_token") is None
     assert response.cookies.get("csrf_access") is None
 
-    assert response.cookies.get("__Host-refresh_token") is None
+    assert response.cookies.get("refresh_token") is None
     assert response.cookies.get("csrf_refresh") is None
 
 
@@ -257,26 +255,26 @@ def test_custom_cookie_key(client):
         return [
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
-            ("authjwt_access_cookie_key", "__Host-access_token"),
-            ("authjwt_refresh_cookie_key", "__Host-refresh_token"),
+            ("authjwt_access_cookie_key", "access_token"),
+            ("authjwt_refresh_cookie_key", "refresh_token"),
             ("authjwt_access_csrf_cookie_key", "csrf_access"),
             ("authjwt_refresh_csrf_cookie_key", "csrf_refresh"),
             ("authjwt_cookie_secure", False),
         ]
 
     response = client.get("/all-token")
-    assert response.cookies.get("__Host-access_token") is not None
+    assert response.cookies.get("access_token") is not None
     assert response.cookies.get("csrf_access") is not None
 
-    assert response.cookies.get("__Host-refresh_token") is not None
+    assert response.cookies.get("refresh_token") is not None
     assert response.cookies.get("csrf_refresh") is not None
 
     response = client.get("/unset-all-token")
 
-    assert response.cookies.get("__Host-access_token") is None
+    assert response.cookies.get("access_token") is None
     assert response.cookies.get("csrf_access") is None
 
-    assert response.cookies.get("__Host-refresh_token") is None
+    assert response.cookies.get("refresh_token") is None
     assert response.cookies.get("csrf_refresh") is None
 
 
@@ -382,7 +380,7 @@ def test_cookie_optional_protected(client):
         return [
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
-            ("authjwt_access_cookie_key", "__Host-access_token"),
+            ("authjwt_access_cookie_key", "access_token"),
             ("authjwt_access_csrf_header_name", "X-CSRF"),
             ("authjwt_cookie_secure", False),
         ]
@@ -404,9 +402,9 @@ def test_cookie_protected(url, client):
         return [
             ("authjwt_token_location", {"cookies"}),
             ("authjwt_secret_key", "secret"),
-            ("authjwt_access_cookie_key", "__Host-access_token"),
+            ("authjwt_access_cookie_key", "access_token"),
             ("authjwt_access_csrf_header_name", "X-CSRF-Access"),
-            ("authjwt_refresh_cookie_key", "__Host-refresh_token"),
+            ("authjwt_refresh_cookie_key", "refresh_token"),
             ("authjwt_refresh_csrf_header_name", "X-CSRF-Refresh"),
             ("authjwt_cookie_secure", False),
         ]
@@ -433,9 +431,9 @@ def test_cookie_protected(url, client):
     response = client.post(url)
     assert response.status_code == 401
     if url != "/jwt-refresh":
-        assert response.json() == {"detail": "Missing or incorrect cookie. Expected: __Host-access_token"}
+        assert response.json() == {"detail": "Missing or incorrect cookie. Expected: access_token"}
     else:
-        assert response.json() == {"detail": "Missing or incorrect cookie. Expected: __Host-refresh_token"}
+        assert response.json() == {"detail": "Missing or incorrect cookie. Expected: refresh_token"}
 
     # change csrf protect to False not check csrf token
     @AuthJWT.load_config

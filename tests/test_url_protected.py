@@ -1,6 +1,6 @@
 import pytest
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from fastapi import FastAPI, Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi.testclient import TestClient
@@ -12,9 +12,7 @@ def client():
 
     @app.exception_handler(AuthJWTException)
     def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-        return JSONResponse(
-            status_code=exc.status_code, content={"detail": exc.message}
-        )
+        return JSONResponse(status_code=exc.status_code, content={"detail": exc.message})
 
     @app.get("/jwt-required")
     def jwt_required(Authorize: AuthJWT = Depends()):
@@ -42,18 +40,14 @@ def client():
     return client
 
 
-@pytest.mark.parametrize(
-    "url", ["/jwt-required", "/jwt-refresh-required", "/fresh-jwt-required"]
-)
+@pytest.mark.parametrize("url", ["/jwt-required", "/jwt-refresh-required", "/fresh-jwt-required"])
 def test_missing_header(client, url):
     response = client.get(url)
     assert response.status_code == 401
     assert response.json() == {"detail": "Missing Authorization Header"}
 
 
-@pytest.mark.parametrize(
-    "url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"]
-)
+@pytest.mark.parametrize("url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"])
 def test_only_access_token_allowed(client, url, Authorize):
     token = Authorize.create_refresh_token(subject="test")
     response = client.get(url, headers={"Authorization": f"Bearer {token}"})
