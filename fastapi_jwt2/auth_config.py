@@ -1,4 +1,4 @@
-from libre_fastapi_jwt.config import LoadConfig
+from fastapi_jwt2.config import LoadConfig
 from pydantic import ValidationError
 from typing import Callable, List
 from datetime import timedelta
@@ -26,8 +26,8 @@ class AuthConfig:
     _refresh_token_expires = timedelta(days=14)
 
     # option for create cookies
-    _access_cookie_key = "__Host-access_token"
-    _refresh_cookie_key = "__Host-refresh_token"
+    _access_cookie_key = "access_token"
+    _refresh_cookie_key = "refresh_token"
     _access_cookie_path = "/"
     _refresh_cookie_path = "/"
     _cookie_max_age = None
@@ -89,6 +89,7 @@ class AuthConfig:
             cls._cookie_domain = config.authjwt_cookie_domain
             cls._cookie_secure = config.authjwt_cookie_secure
             cls._cookie_samesite = config.authjwt_cookie_samesite
+
             # option for double submit csrf protection
             cls._cookie_csrf_protect = config.authjwt_cookie_csrf_protect
             cls._access_csrf_cookie_key = config.authjwt_access_csrf_cookie_key
@@ -104,7 +105,7 @@ class AuthConfig:
             cls._token_type_claim_name = config.authjwt_token_type_claim_name
         except ValidationError:
             raise
-        except Exception:
+        except Exception as exc:
             raise TypeError("Config must be pydantic 'BaseSettings' or list of tuple")
 
     @classmethod

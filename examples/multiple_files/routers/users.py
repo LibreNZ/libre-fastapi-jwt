@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from libre_fastapi_jwt import AuthJWT
+from fastapi_jwt2 import AuthJWT
 from pydantic import BaseModel
 
 

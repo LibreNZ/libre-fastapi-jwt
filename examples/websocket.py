@@ -1,7 +1,7 @@
 from fastapi import FastAPI, WebSocket, Depends, Request, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -63,9 +63,7 @@ async def get():
 
 
 @app.websocket("/ws")
-async def websocket(
-    websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()
-):
+async def websocket(websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()):
     await websocket.accept()
     try:
         Authorize.jwt_required("websocket", token=token)

@@ -1,6 +1,6 @@
 import pytest
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from fastapi import FastAPI, Depends, WebSocket, Query
 from fastapi.testclient import TestClient
 
@@ -23,9 +23,7 @@ def client():
         return {"msg": "unset all token"}
 
     @app.websocket("/jwt-required")
-    async def websocket_jwt_required(
-        websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()
-    ):
+    async def websocket_jwt_required(websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()):
         await websocket.accept()
         try:
             Authorize.jwt_required("websocket", token=token)
@@ -42,18 +40,14 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_required(
-                "websocket", websocket=websocket, csrf_token=csrf_token
-            )
+            Authorize.jwt_required("websocket", websocket=websocket, csrf_token=csrf_token)
             await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
         await websocket.close()
 
     @app.websocket("/jwt-optional")
-    async def websocket_jwt_optional(
-        websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()
-    ):
+    async def websocket_jwt_optional(websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()):
         await websocket.accept()
         try:
             Authorize.jwt_optional("websocket", token=token)
@@ -73,9 +67,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_optional(
-                "websocket", websocket=websocket, csrf_token=csrf_token
-            )
+            Authorize.jwt_optional("websocket", websocket=websocket, csrf_token=csrf_token)
             decoded_token = Authorize.get_raw_jwt()
             if decoded_token:
                 await websocket.send_text("hello world")
@@ -104,9 +96,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_refresh_token_required(
-                "websocket", websocket=websocket, csrf_token=csrf_token
-            )
+            Authorize.jwt_refresh_token_required("websocket", websocket=websocket, csrf_token=csrf_token)
             await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
@@ -132,9 +122,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.fresh_jwt_required(
-                "websocket", websocket=websocket, csrf_token=csrf_token
-            )
+            Authorize.fresh_jwt_required("websocket", websocket=websocket, csrf_token=csrf_token)
             await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
@@ -144,9 +132,7 @@ def client():
     return client
 
 
-@pytest.mark.parametrize(
-    "url", ["/jwt-required", "/jwt-refresh-required", "/fresh-jwt-required"]
-)
+@pytest.mark.parametrize("url", ["/jwt-required", "/jwt-refresh-required", "/fresh-jwt-required"])
 def test_missing_token_websocket(client, url):
     token_type = "access" if url != "/jwt-refresh-required" else "refresh"
     with client.websocket_connect(url + "?token=") as websocket:
@@ -154,9 +140,7 @@ def test_missing_token_websocket(client, url):
         assert data == f"Missing {token_type} token from Query or Path"
 
 
-@pytest.mark.parametrize(
-    "url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"]
-)
+@pytest.mark.parametrize("url", ["/jwt-required", "/jwt-optional", "/fresh-jwt-required"])
 def test_only_access_token_allowed_websocket(client, url, Authorize):
     token = Authorize.create_refresh_token(subject="test")
     with client.websocket_connect(url + f"?token={token}") as websocket:
@@ -236,11 +220,7 @@ def test_invalid_instance_websocket(Authorize):
     ],
 )
 def test_missing_cookie(url, client):
-    cookie_key = (
-        "__Host-access_token"
-        if url != "/jwt-refresh-required-cookies"
-        else "__Host-refresh_token"
-    )
+    cookie_key = "access_token" if url != "/jwt-refresh-required-cookies" else "refresh_token"
     with client.websocket_connect(url + "?csrf_token=") as websocket:
         data = websocket.receive_text()
         assert data == f"Missing or incorrect cookie. Expected: {cookie_key}"

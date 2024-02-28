@@ -1,10 +1,10 @@
 These are only applicable if `authjwt_token_location` is use cookies.
 
 `authjwt_access_cookie_key`
-:   The key of the cookie that holds the access token. Defaults to `__Host-access_token`
+:   The key of the cookie that holds the access token. Defaults to `access_token`
 
 `authjwt_refresh_cookie_key`
-:   The key of the cookie that holds the refresh token. Defaults to `__Host-refresh_token`
+:   The key of the cookie that holds the refresh token. Defaults to `refresh_token`
 
 `authjwt_access_cookie_path`
 :   What path should be set for the access cookie. Defaults to `'/'`, which will cause this

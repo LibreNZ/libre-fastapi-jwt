@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
-from libre_fastapi_jwt import AuthJWT
-from libre_fastapi_jwt.exceptions import AuthJWTException
+from fastapi_jwt2 import AuthJWT
+from fastapi_jwt2.exceptions import AuthJWTException
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -34,9 +34,7 @@ def login(user: User, Authorize: AuthJWT = Depends()):
     # You can be passing custom claim to argument user_claims
     # in function create_access_token() or create refresh token()
     another_claims = {"foo": ["fiz", "baz"]}
-    access_token = Authorize.create_access_token(
-        subject=user.username, user_claims=another_claims
-    )
+    access_token = Authorize.create_access_token(subject=user.username, user_claims=another_claims)
     return {"access_token": access_token}
 
 

@@ -1,5 +1,5 @@
 import pytest
-from libre_fastapi_jwt import AuthJWT
+from fastapi_jwt2 import AuthJWT
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
 
@@ -41,9 +41,7 @@ def client():
     return client
 
 
-@pytest.mark.parametrize(
-    "url", ["/jwt-optional", "/jwt-required", "/jwt-refresh", "/jwt-fresh"]
-)
+@pytest.mark.parametrize("url", ["/jwt-optional", "/jwt-required", "/jwt-refresh", "/jwt-fresh"])
 def test_get_subject_through_cookie_or_headers(url, client):
     @AuthJWT.load_config
     def get_secret_key():
@@ -64,9 +62,7 @@ def test_get_subject_through_cookie_or_headers(url, client):
     if url != "/jwt-refresh":
         response = client.post(url, headers={"Authorization": f"Bearer {access_token}"})
     else:
-        response = client.post(
-            url, headers={"Authorization": f"Bearer {refresh_token}"}
-        )
+        response = client.post(url, headers={"Authorization": f"Bearer {refresh_token}"})
 
     assert response.status_code == 200
     assert response.json() == {"hello": 1}
