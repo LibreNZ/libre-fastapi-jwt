@@ -215,6 +215,13 @@ def test_fresh_jwt_required_websocket(client, Authorize):
 
 # ========= COOKIES ========
 
+@AuthJWT.load_config
+def get_cookie_location():
+    return [
+        ("authjwt_token_location", {"cookies"}),
+        ("authjwt_secret_key", "secret"),
+        ("authjwt_cookie_secure", False),
+    ]
 
 def test_invalid_instance_websocket(Authorize):
     with pytest.raises(TypeError, match=r"request"):
@@ -256,14 +263,6 @@ def test_missing_cookie(url, client):
     ],
 )
 def test_missing_csrf_token(url, client):
-    @AuthJWT.load_config
-    def get_cookie_location():
-        return [
-            ("authjwt_token_location", {"cookies"}),
-            ("authjwt_secret_key", "secret"),
-            ("authjwt_cookie_secure", False),
-        ]
-
     # required and optional
     client.get("/all-token")
 
@@ -352,14 +351,6 @@ def test_missing_claim_csrf_in_token(url, client):
 )
 def test_invalid_csrf_double_submit(url, client):
     # required and optional
-    @AuthJWT.load_config
-    def get_cookie_location():
-        return [
-            ("authjwt_token_location", {"cookies"}),
-            ("authjwt_secret_key", "secret"),
-            ("authjwt_cookie_secure", False),
-        ]
-
     client.get("/all-token")
 
     with client.websocket_connect(url + "?csrf_token=test") as websocket:
@@ -392,14 +383,6 @@ def test_invalid_csrf_double_submit(url, client):
 )
 def test_valid_access_endpoint_with_csrf(url, client):
     # required and optional
-    @AuthJWT.load_config
-    def get_cookie_location():
-        return [
-            ("authjwt_token_location", {"cookies"}),
-            ("authjwt_secret_key", "secret"),
-            ("authjwt_cookie_secure", False),
-        ]
-
     res = client.get("/all-token")
     csrf_access = res.cookies.get("csrf_access")
     csrf_refresh = res.cookies.get("csrf_refresh")
