@@ -83,9 +83,13 @@ class LoadConfig(BaseModel):
 
     @field_validator('authjwt_csrf_methods')
     def validate_csrf_methods(cls, v):
-        if v.upper() not in {"GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"}:
-            raise ValueError("The 'authjwt_csrf_methods' must be between http request methods")
-        return v.upper()
+        if v is not None:
+            if not all(method.upper() in {"GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"} for method in v):
+                raise ValueError("The 'authjwt_csrf_methods' must be between http request methods")
+            return [method.upper() for method in v]
+        # if v.upper() not in {"GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"}:
+        #     raise ValueError("The 'authjwt_csrf_methods' must be between http request methods")
+        # return v.upper()
 
     @field_validator('authjwt_token_type_claim_name')
     def validate_token_type_claim_name(cls, v):
