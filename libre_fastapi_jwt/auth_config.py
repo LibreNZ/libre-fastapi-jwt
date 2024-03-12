@@ -6,7 +6,7 @@ from datetime import timedelta
 
 class AuthConfig:
     _token = None
-    _token_location = {"headers"}
+    _token_location = ["headers"]
 
     _secret_key = None
     _public_key = None
@@ -18,7 +18,7 @@ class AuthConfig:
     _decode_issuer = None
     _decode_audience = None
     _denylist_enabled = False
-    _denylist_token_checks = {"access", "refresh"}
+    _denylist_token_checks = ["access", "refresh"]
     _header_name = "Authorization"
     _header_type = "Bearer"
     _token_in_denylist_callback = None
@@ -43,7 +43,7 @@ class AuthConfig:
     _refresh_csrf_cookie_path = "/"
     _access_csrf_header_name = "X-CSRF-Token"
     _refresh_csrf_header_name = "X-CSRF-Token"
-    _csrf_methods = {"POST", "PUT", "PATCH", "DELETE"}
+    _csrf_methods = ["POST", "PUT", "PATCH", "DELETE"]
 
     # options to adjust token's type claim
     _token_type_claim = True
