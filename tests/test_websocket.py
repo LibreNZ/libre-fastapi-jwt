@@ -4,20 +4,18 @@ from libre_fastapi_jwt.exceptions import AuthJWTException
 from fastapi import FastAPI, Depends, WebSocket, Query
 from fastapi.testclient import TestClient
 
-@AuthJWT.load_config
-def get_cookie_location():
-    return [
-        ("authjwt_token_location", ["cookies"]),
-        ("authjwt_secret_key", "secret"),
-        ("authjwt_cookie_secure", False),
-    ]
-
-# Ensure this function is called before set_access_cookies()
-get_cookie_location()
 
 @pytest.fixture(scope="function")
 def client():
     app = FastAPI()
+
+    @AuthJWT.load_config
+    def get_cookie_location():
+        return [
+            ("authjwt_token_location", ["cookies"]),
+            ("authjwt_secret_key", "secret"),
+            ("authjwt_cookie_secure", False),
+        ]
 
     @app.get("/all-token")
     def all_token(Authorize: AuthJWT = Depends()):
