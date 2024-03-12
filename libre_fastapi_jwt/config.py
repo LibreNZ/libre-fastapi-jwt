@@ -2,11 +2,11 @@ from datetime import timedelta
 from typing import Optional, Union, Sequence, List
 from pydantic import (
     BaseModel,
-    validator,
     StrictBool,
     StrictInt,
     StrictStr,
-    StrictBytes
+    StrictBytes,
+    field_validator
 )
 
 class LoadConfig(BaseModel):
