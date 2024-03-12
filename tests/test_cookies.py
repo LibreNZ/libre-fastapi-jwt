@@ -298,7 +298,7 @@ def test_cookie_optional_protected(client):
     @AuthJWT.load_config
     def change_request_methods():
         return [
-            ("authjwt_csrf_methods", {"GET"}),
+            ("authjwt_csrf_methods", ["GET"]),
             ("authjwt_token_location", ["cookies"]),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_secure", False),
