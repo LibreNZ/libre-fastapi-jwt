@@ -1,3 +1,6 @@
+## 0.21.1
+* Updated all dependencies to their latest version
+
 ## 0.20.5
 * Removed unused variable
 * Made `set_pair_cookies()` to merge user_claim Dict instead of relying on default value
