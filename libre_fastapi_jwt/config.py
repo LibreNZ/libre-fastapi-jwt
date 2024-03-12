@@ -99,6 +99,4 @@ class LoadConfig(BaseModel):
             raise ValueError("The 'authjwt_token_type_claim_name' can not override default JWT claims")
         return v
 
-    Config = ConfigDict()
-    Config.str_min_length = 1
-    Config.str_strip_whitespace = True
+    Config = ConfigDict(str_min_length=1, str_strip_whitespace=True)
