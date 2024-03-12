@@ -2,7 +2,8 @@ import pytest, os, jwt
 from libre_fastapi_jwt import AuthJWT
 from fastapi import FastAPI, Depends
 from fastapi.testclient import TestClient
-from pydantic import BaseSettings, ValidationError
+from pydantic import ValidationError
+from pydantic_settings import BaseSettings
 from typing import Sequence, Optional
 from datetime import timedelta
 

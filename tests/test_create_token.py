@@ -1,6 +1,6 @@
 import pytest, jwt
 from libre_fastapi_jwt import AuthJWT
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from datetime import timedelta, datetime, timezone
 
 

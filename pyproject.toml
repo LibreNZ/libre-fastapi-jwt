@@ -29,6 +29,7 @@ PyJWT = "^2.6.0"
 fastapi = ">=0.95.1"
 cryptography = ">=41.0.0"
 httpx = ">=0.14.0"
+pydantic-settings = "^2.2.1"
 
 
 [tool.poetry.dev-dependencies]

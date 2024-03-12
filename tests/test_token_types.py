@@ -2,7 +2,7 @@ import jwt
 import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from libre_fastapi_jwt import AuthJWT
 
