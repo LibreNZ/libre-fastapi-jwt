@@ -64,16 +64,17 @@ class LoadConfig(BaseModel):
 
     @field_validator('authjwt_denylist_token_checks')
     def validate_denylist_token_checks(cls, v):
-        if v not in ['access','refresh']:
-            raise ValueError("The 'authjwt_denylist_token_checks' must be between 'access' or 'refresh'")
-        return v
+        if v is not None:
+            if not all(item in ['access', 'refresh'] for item in v):
+                raise ValueError("Each item in 'authjwt_denylist_token_checks' must be either 'access' or 'refresh'")
+            return v
 
     @field_validator('authjwt_token_location')
     def validate_token_location(cls, v):
         if v is not None:
             if not all(item in ['headers', 'cookies'] for item in v):
                 raise ValueError("Each item in 'authjwt_token_location' must be either 'headers' or 'cookies'")
-        return v
+            return v
 
     @field_validator('authjwt_cookie_samesite')
     def validate_cookie_samesite(cls, v):
