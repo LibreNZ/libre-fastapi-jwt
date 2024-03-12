@@ -21,7 +21,7 @@ def client():
 
 def test_default_config():
     assert AuthJWT._token is None
-    assert AuthJWT._token_location == {"headers"}
+    assert AuthJWT._token_location == ["headers"]
     assert AuthJWT._secret_key is None
     assert AuthJWT._public_key is None
     assert AuthJWT._private_key is None
@@ -32,7 +32,7 @@ def test_default_config():
     assert AuthJWT._decode_issuer is None
     assert AuthJWT._decode_audience is None
     assert AuthJWT._denylist_enabled is False
-    assert AuthJWT._denylist_token_checks == {"access", "refresh"}
+    assert AuthJWT._denylist_token_checks == ["access", "refresh"]
     assert AuthJWT._token_in_denylist_callback is None
     assert AuthJWT._header_name == "Authorization"
     assert AuthJWT._header_type == "Bearer"
@@ -59,7 +59,7 @@ def test_default_config():
     assert AuthJWT._refresh_csrf_cookie_path == "/"
     assert AuthJWT._access_csrf_header_name == "X-CSRF-Token"
     assert AuthJWT._refresh_csrf_header_name == "X-CSRF-Token"
-    assert AuthJWT._csrf_methods == {"POST", "PUT", "PATCH", "DELETE"}
+    assert AuthJWT._csrf_methods == ["POST", "PUT", "PATCH", "DELETE"]
     assert AuthJWT._token_type_claim == True
     assert AuthJWT._access_token_type == "access"
     assert AuthJWT._refresh_token_type == "refresh"
