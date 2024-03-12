@@ -1,3 +1,6 @@
+## 0.21.2
+* Fixed all test cases
+
 ## 0.21.1
 * Updated all dependencies to their latest version
 
