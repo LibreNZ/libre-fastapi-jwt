@@ -218,7 +218,7 @@ def test_fresh_jwt_required_websocket(client, Authorize):
 @AuthJWT.load_config
 def get_cookie_location():
     return [
-        ("authjwt_token_location", {"cookies"}),
+        ("authjwt_token_location", ["cookies"]),
         ("authjwt_secret_key", "secret"),
         ("authjwt_cookie_secure", False),
     ]
@@ -276,7 +276,7 @@ def test_missing_csrf_token(url, client):
     @AuthJWT.load_config
     def change_request_csrf_protect_to_false():
         return [
-            ("authjwt_token_location", {"cookies"}),
+            ("authjwt_token_location", ["cookies"]),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_csrf_protect", False),
             ("authjwt_cookie_secure", False),
@@ -304,7 +304,7 @@ def test_missing_claim_csrf_in_token(url, client):
     @AuthJWT.load_config
     def change_request_csrf_protect_to_false():
         return [
-            ("authjwt_token_location", {"cookies"}),
+            ("authjwt_token_location", ["cookies"]),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_csrf_protect", False),
             ("authjwt_cookie_secure", False),
@@ -315,7 +315,7 @@ def test_missing_claim_csrf_in_token(url, client):
     @AuthJWT.load_config
     def change_request_csrf_protect_to_true():
         return [
-            ("authjwt_token_location", {"cookies"}),
+            ("authjwt_token_location", ["cookies"]),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_secure", False),
         ]
@@ -328,7 +328,7 @@ def test_missing_claim_csrf_in_token(url, client):
     @AuthJWT.load_config
     def change_request_csrf_protect_to_false_again():
         return [
-            ("authjwt_token_location", {"cookies"}),
+            ("authjwt_token_location", ["cookies"]),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_csrf_protect", False),
             ("authjwt_cookie_secure", False),
@@ -361,7 +361,7 @@ def test_invalid_csrf_double_submit(url, client):
     @AuthJWT.load_config
     def change_request_csrf_protect_to_false():
         return [
-            ("authjwt_token_location", {"cookies"}),
+            ("authjwt_token_location", ["cookies"]),
             ("authjwt_secret_key", "secret"),
             ("authjwt_cookie_csrf_protect", False),
         ]
