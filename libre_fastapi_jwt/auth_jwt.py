@@ -5,6 +5,7 @@ from typing import Dict, Optional, Sequence, Union
 from fastapi import Request, Response, WebSocket, Header
 from jwt.algorithms import has_crypto, requires_cryptography
 from jwt.exceptions import ExpiredSignatureError
+
 from libre_fastapi_jwt.auth_config import AuthConfig
 from libre_fastapi_jwt.exceptions import (
     AccessTokenRequired,
