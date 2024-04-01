@@ -2,9 +2,10 @@ from libre_fastapi_jwt.config import LoadConfig
 from pydantic import ValidationError
 from typing import Callable, List
 from datetime import timedelta
+from fastapi.security.base import SecurityBase
 
 
-class AuthConfig:
+class AuthConfig(SecurityBase):
     _token = None
     _token_location = {"headers"}
 
