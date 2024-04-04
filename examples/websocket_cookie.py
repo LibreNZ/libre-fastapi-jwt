@@ -1,6 +1,6 @@
 from fastapi import FastAPI, WebSocket, Depends, Query
 from fastapi.responses import HTMLResponse
-from libre_fastapi_jwt import AuthJWT
+from libre_fastapi_jwt import AuthJWT, AuthJWTBearer
 from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 
@@ -19,6 +19,7 @@ class Settings(BaseModel):
 def get_config():
     return Settings()
 
+auth_dep = AuthJWTBearer()
 
 html = """
 <!DOCTYPE html>
@@ -63,7 +64,7 @@ async def get():
 
 @app.websocket("/ws")
 async def websocket(
-    websocket: WebSocket, csrf_token: str = Query(...), Authorize: AuthJWT = Depends()
+    websocket: WebSocket, csrf_token: str = Query(...), Authorize: AuthJWT = Depends(auth_dep)
 ):
     await websocket.accept()
     try:
@@ -83,7 +84,7 @@ async def websocket(
 # function is used to actually generate the token to use authorization
 # later in endpoint protected
 @app.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")
 

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
-from libre_fastapi_jwt import AuthJWT
+from libre_fastapi_jwt import AuthJWT, AuthJWTBearer
 from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 
@@ -20,6 +20,7 @@ class Settings(BaseModel):
 def get_config():
     return Settings()
 
+auth_dep = AuthJWTBearer()
 
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
@@ -27,7 +28,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 
 @app.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")
 
@@ -36,7 +37,7 @@ def login(user: User, Authorize: AuthJWT = Depends()):
 
 
 @app.get("/partially-protected")
-def partially_protected(Authorize: AuthJWT = Depends()):
+def partially_protected(Authorize: AuthJWT = Depends(auth_dep)):
     Authorize.jwt_optional()
 
     # If no jwt is sent in the request, get_jwt_subject() will return None

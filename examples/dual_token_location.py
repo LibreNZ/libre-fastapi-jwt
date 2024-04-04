@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
-from libre_fastapi_jwt import AuthJWT
+from libre_fastapi_jwt import AuthJWT, AuthJWTBearer
 from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 from datetime import timedelta
@@ -34,6 +34,7 @@ class Settings(BaseModel):
 def get_config():
     return Settings()
 
+auth_dep = AuthJWTBearer()
 
 # exception handler for authjwt
 # in production, you can tweak performance using orjson response
@@ -46,7 +47,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 # function is used to actually generate the token to use authorization
 # later in endpoint protected
 @app.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")
 
@@ -68,7 +69,7 @@ def login(user: User, Authorize: AuthJWT = Depends()):
 # protect endpoint with function jwt_required(), which requires
 # a valid access token in the request headers to access.
 @app.get("/user")
-def user(Authorize: AuthJWT = Depends()):
+def user(Authorize: AuthJWT = Depends(auth_dep)):
     Authorize.jwt_required()
 
     current_user = Authorize.get_jwt_subject()
@@ -77,7 +78,7 @@ def user(Authorize: AuthJWT = Depends()):
 # If CSRF protection is True, this won't work unless the DELETE request comes with a header that includes the csrf token in the cookies.
 # Something along the lines of `https://localhost:8000/logout?X-CSRF-Token=${csrf_token}`
 @app.delete("/logout")
-def logout(Authorize: AuthJWT = Depends()):
+def logout(Authorize: AuthJWT = Depends(auth_dep)):
     """
     Because the JWT are stored in an httponly cookie now, we cannot
     log the user out by simply deleting the cookies in the frontend.

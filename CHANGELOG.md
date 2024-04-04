@@ -1,3 +1,6 @@
+## 0.22.2
+* Added AuthJWTBearer class following the work done in (https://sijokun.github.io/async-fastapi-jwt-auth)
+
 ## 0.21.4
 * Added FastAPI SecurityBase class
 

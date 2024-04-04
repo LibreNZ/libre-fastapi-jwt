@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
-from libre_fastapi_jwt import AuthJWT
+from libre_fastapi_jwt import AuthJWT, AuthJWTBearer
 from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 
@@ -29,6 +29,7 @@ class Settings(BaseModel):
 def get_config():
     return Settings()
 
+auth_dep = AuthJWTBearer()
 
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
@@ -36,7 +37,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 
 @app.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")
 
@@ -51,7 +52,7 @@ def login(user: User, Authorize: AuthJWT = Depends()):
 
 
 @app.post("/refresh")
-def refresh(Authorize: AuthJWT = Depends()):
+def refresh(Authorize: AuthJWT = Depends(auth_dep)):
     Authorize.jwt_refresh_token_required()
 
     current_user = Authorize.get_jwt_subject()
@@ -62,7 +63,7 @@ def refresh(Authorize: AuthJWT = Depends()):
 
 
 @app.delete("/logout")
-def logout(Authorize: AuthJWT = Depends()):
+def logout(Authorize: AuthJWT = Depends(auth_dep)):
     """
     Because the JWT are stored in an httponly cookie now, we cannot
     log the user out by simply deleting the cookies in the frontend.
@@ -75,7 +76,7 @@ def logout(Authorize: AuthJWT = Depends()):
 
 
 @app.get("/protected")
-def protected(Authorize: AuthJWT = Depends()):
+def protected(Authorize: AuthJWT = Depends(auth_dep)):
     """
     We do not need to make any changes to our protected endpoints. They
     will all still function the exact same as they do when sending the

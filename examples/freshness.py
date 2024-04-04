@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.responses import JSONResponse
-from libre_fastapi_jwt import AuthJWT
+from libre_fastapi_jwt import AuthJWT, AuthJWTBearer
 from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 
@@ -20,6 +20,7 @@ class Settings(BaseModel):
 def get_config():
     return Settings()
 
+auth_dep = AuthJWTBearer()
 
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
@@ -28,7 +29,7 @@ def authjwt_exception_handler(request: Request, exc: AuthJWTException):
 
 # Standard login endpoint. Will return a fresh access token and a refresh token
 @app.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")
 
@@ -44,7 +45,7 @@ def login(user: User, Authorize: AuthJWT = Depends()):
 
 
 @app.post("/refresh")
-def refresh(Authorize: AuthJWT = Depends()):
+def refresh(Authorize: AuthJWT = Depends(auth_dep)):
     """
     Refresh token endpoint. This will generate a new access token from
     the refresh token, but will mark that access token as non-fresh,
@@ -58,7 +59,7 @@ def refresh(Authorize: AuthJWT = Depends()):
 
 
 @app.post("/fresh-login")
-def fresh_login(user: User, Authorize: AuthJWT = Depends()):
+def fresh_login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     """
     Fresh login endpoint. This is designed to be used if we need to
     make a fresh token for a user (by verifying they have the
@@ -75,7 +76,7 @@ def fresh_login(user: User, Authorize: AuthJWT = Depends()):
 
 # Any valid JWT access token can access this endpoint
 @app.get("/protected")
-def protected(Authorize: AuthJWT = Depends()):
+def protected(Authorize: AuthJWT = Depends(auth_dep)):
     Authorize.jwt_required()
 
     current_user = Authorize.get_jwt_subject()
@@ -84,7 +85,7 @@ def protected(Authorize: AuthJWT = Depends()):
 
 # Only fresh JWT access token can access this endpoint
 @app.get("/protected-fresh")
-def protected_fresh(Authorize: AuthJWT = Depends()):
+def protected_fresh(Authorize: AuthJWT = Depends(auth_dep)):
     Authorize.fresh_jwt_required()
 
     current_user = Authorize.get_jwt_subject()

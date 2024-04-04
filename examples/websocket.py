@@ -1,6 +1,6 @@
 from fastapi import FastAPI, WebSocket, Depends, Request, HTTPException, Query
 from fastapi.responses import HTMLResponse, JSONResponse
-from libre_fastapi_jwt import AuthJWT
+from libre_fastapi_jwt import AuthJWT, AuthJWTBearer
 from libre_fastapi_jwt.exceptions import AuthJWTException
 from pydantic import BaseModel
 
@@ -20,6 +20,7 @@ class Settings(BaseModel):
 def get_config():
     return Settings()
 
+auth_dep = AuthJWTBearer()
 
 @app.exception_handler(AuthJWTException)
 def authjwt_exception_handler(request: Request, exc: AuthJWTException):
@@ -64,7 +65,7 @@ async def get():
 
 @app.websocket("/ws")
 async def websocket(
-    websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends()
+    websocket: WebSocket, token: str = Query(...), Authorize: AuthJWT = Depends(auth_dep)
 ):
     await websocket.accept()
     try:
@@ -81,7 +82,7 @@ async def websocket(
 
 
 @app.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")
 

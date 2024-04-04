@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from libre_fastapi_jwt import AuthJWT
+from libre_fastapi_jwt import AuthJWT, AuthJWTBearer
 from pydantic import BaseModel
 
 
@@ -10,9 +10,10 @@ class User(BaseModel):
 
 router = APIRouter()
 
+auth_dep = AuthJWTBearer()
 
 @router.post("/login")
-def login(user: User, Authorize: AuthJWT = Depends()):
+def login(user: User, Authorize: AuthJWT = Depends(auth_dep)):
     if user.username != "test" or user.password != "test":
         raise HTTPException(status_code=401, detail="Bad username or password")
 
