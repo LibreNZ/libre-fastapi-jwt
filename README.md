@@ -8,20 +8,24 @@
 [![Downloads](https://static.pepy.tech/personalized-badge/libre-fastapi-jwt?period=total&units=international_system&left_color=grey&right_color=brightgreen&left_text=Downloads)](https://pepy.tech/project/libre-fastapi-jwt)
 
 ---
-<h3> BTW - The project is based on <a href="https://pypi.org/project/libre-fastapi-jwt/" target="_blank">Fastapi-jwt-auth</a> that is no longer maintained. </h3> 
+
 
 **Documentation**: <a href="https://LibreNZ.github.io/libre-fastapi-jwt" target="_blank">https://LibreNZ.github.io/libre-fastapi-jwt</a>
 
 **Source Code**: <a href="https://github.com/LibreNZ/libre-fastapi-jwt" target="_blank">https://github.com/LibreNZ/libre-fastapi-jwt</a>
 
 ---
+>This project was originally based on <a href="https://pypi.org/project/libre-fastapi-jwt/" target="_blank">Fastapi-jwt-auth</a> 
+---
 
 ## Features
 FastAPI extension that provides JWT Auth support (secure, easy to use and lightweight), if you were familiar with flask-jwt-extended this extension suitable for you, cause this extension inspired by flask-jwt-extended 😀
 
+- Integrated with the <img src="docs/image.png" alt="drawing" width="100" style="align: center; margin: auto; "/> button
 - Access tokens and refresh tokens
 - Freshness Tokens
 - Revoking Tokens
+- Dual Tokens (cookie and headers)
 - Support for WebSocket authorization
 - Support for adding custom claims to JSON Web Tokens
 - Storing tokens in cookies and CSRF protection
