@@ -8,6 +8,7 @@ import jwt
 from fastapi import Request, Response, WebSocket, Header
 from fastapi.openapi.models import HTTPBearer as HTTPBearerModel
 from fastapi.security.http import HTTPBase
+
 from jwt.algorithms import has_crypto, requires_cryptography
 from jwt.exceptions import ExpiredSignatureError
 
@@ -50,10 +51,10 @@ class AuthJWT(AuthConfig):
             self._response = res
 
         if req:
-            # get request object when cookies in token location
+            # get request object when 'cookies' in authjwt_token_location
             if self.jwt_in_cookies:
                 self._request = req
-            # get jwt in headers when headers in token location
+            # get jwt in headers when 'headers' in authjwt_token_location
             if self.jwt_in_headers:
                 auth = req.headers.get(self._header_name.lower())
                 if auth:
@@ -920,7 +921,7 @@ class AuthJWT(AuthConfig):
     def jwt_required(
         self,
         auth_from: str = "request",
-        token: Optional[str] = None,
+        token: Optional[str] = Security(APIKeyCookie(name="Authorization", auto_error=False)),
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
         roles: list = [],
@@ -930,11 +931,9 @@ class AuthJWT(AuthConfig):
         Only access token can access this function
 
         :param auth_from: for identity get token from HTTP or WebSocket
-        :param token: the encoded JWT, it's required if the protected endpoint use WebSocket to
-                      authorization and get token from Query Url or Path
+        :param token: the encoded JWT, it's required if the protected endpoint use WebSocket to authorize and get token from Query Url or Path
         :param websocket: an instance of WebSocket, it's required if protected endpoint use a cookie to authorization
-        :param csrf_token: the CSRF double submit token. since WebSocket cannot add specifying additional headers
-                           its must be passing csrf_token manually and can achieve by Query Url or Path
+        :param csrf_token: the CSRF double submit token. Since WebSocket cannot add specific additional headers, it must pass csrf_token manually to achieve a Query Url or Path
         """
         self._required_claims = claims
         self._required_roles = roles

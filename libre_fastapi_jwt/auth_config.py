@@ -4,7 +4,7 @@ from typing import Callable, List
 from datetime import timedelta
 
 
-class AuthConfig:
+class AuthConfig():
     _token = None
     _token_location = {"headers"}
 

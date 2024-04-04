@@ -1,4 +1,4 @@
-These are only applicable if `authjwt_token_location` is use headers.
+These are only applicable if `authjwt_token_location` is to use headers.
 
 `authjwt_header_name`
 :   What header to look for the JWT in a request. Defaults to `Authorization`
