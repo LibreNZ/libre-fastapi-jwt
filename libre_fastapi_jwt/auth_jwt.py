@@ -921,7 +921,7 @@ class AuthJWT(AuthConfig):
     def jwt_required(
         self,
         auth_from: str = "request",
-        token: Optional[str] = Security(APIKeyCookie(name="Authorization", auto_error=False)),
+        token: Optional[str] = None,
         websocket: Optional[WebSocket] = None,
         csrf_token: Optional[str] = None,
         roles: list = [],
