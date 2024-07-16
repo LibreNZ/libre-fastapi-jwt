@@ -15,7 +15,7 @@
 **Source Code**: <a href="https://github.com/LibreNZ/libre-fastapi-jwt" target="_blank">https://github.com/LibreNZ/libre-fastapi-jwt</a>
 
 ---
->This project was originally based on <a href="https://pypi.org/project/libre-fastapi-jwt/" target="_blank">Fastapi-jwt-auth</a> 
+>This project was originally based on <a href="https://github.com/IndominusByte/fastapi-jwt-auth" target="_blank">fastapi-jwt-auth</a> 
 ---
 
 ## Features
