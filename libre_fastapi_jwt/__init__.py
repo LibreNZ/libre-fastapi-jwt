@@ -1,5 +1,5 @@
 """FastAPI extension that provides JWT Auth support (secure, easy to use and lightweight)"""
 
-__version__ = "0.22.2"
+__version__ = "0.22.3"
 
 from .auth_jwt import AuthJWT, AuthJWTBearer

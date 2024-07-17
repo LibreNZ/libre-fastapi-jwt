@@ -1,3 +1,7 @@
+## 0.22.3
+* Replace `Request` with `HTTPConnection`
+* Updated all dependencies
+
 ## 0.22.2
 * Added AuthJWTBearer class following the work done in (https://sijokun.github.io/async-fastapi-jwt-auth)
 
