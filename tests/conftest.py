@@ -1,3 +1,5 @@
+import logging
+logging.basicConfig(level=logging.DEBUG)
 import pytest
 from libre_fastapi_jwt import AuthJWT
 from libre_fastapi_jwt.config import LoadConfig
