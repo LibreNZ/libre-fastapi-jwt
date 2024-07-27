@@ -1,4 +1,5 @@
 import logging
+
 # Get the logger instance
 logger = logging.getLogger(__name__)
 import hmac
@@ -96,7 +97,9 @@ class AuthJWT(AuthConfig):
 
         # Make sure the header is in a valid format that we are expecting, ie
         if not header_type:
-            logger.debug("No header type specified, expecting format like: 'Bearer: <JWT>'")
+            logger.debug(
+                "No header type specified, expecting format like: 'Bearer: <JWT>'"
+            )
             # <HeaderName>: <JWT>
             if len(parts) != 1:
                 msg = "Bad {} header. Expected value '<JWT>'".format(header_name)
@@ -104,7 +107,9 @@ class AuthJWT(AuthConfig):
             self._token = parts[0]
             logger.debug(f"Token extracted: {self._token}")
         else:
-            logger.debug(f"Header type specified, expected format would be: '{header_type} <JWT>'")
+            logger.debug(
+                f"Header type specified, expected format would be: '{header_type} <JWT>'"
+            )
             # <HeaderName>: <HeaderType> <JWT>
             if not re.match(r"{}\s".format(header_type), auth) or len(parts) != 2:
                 msg = "Bad {} header. Expected value '{} <JWT>'".format(
@@ -139,7 +144,9 @@ class AuthJWT(AuthConfig):
 
         :return: plain text or RSA depends on algorithm
         """
-        logger.debug(f"Getting secret key for algorithm: {algorithm} and process: {process}")
+        logger.debug(
+            f"Getting secret key for algorithm: {algorithm} and process: {process}"
+        )
         symmetric_algorithms, asymmetric_algorithms = {
             "HS256",
             "HS384",
@@ -219,7 +226,7 @@ class AuthJWT(AuthConfig):
         :return: Encoded token
         """
         logger.debug("Creating token...")
-        
+
         # Validation type data
         if not isinstance(subject, (str, int)):
             logger.error("Invalid subject type. Must be a string or integer.")
@@ -239,9 +246,9 @@ class AuthJWT(AuthConfig):
         if user_claims and not isinstance(user_claims, dict):
             logger.error("Invalid user_claims type. Must be a dictionary.")
             raise TypeError("user_claims must be a dictionary")
-        
+
         logger.debug("All input parameters validated successfully.")
-        
+
         # Data section
         reserved_claims = {
             "sub": subject,
@@ -250,51 +257,51 @@ class AuthJWT(AuthConfig):
             "jti": self._get_jwt_identifier(),
         }
         logger.debug(f"Reserved claims: {reserved_claims}")
-        
+
         token_types = {
             "access": self._access_token_type,
             "refresh": self._refresh_token_type,
         }
         logger.debug(f"Token types: {token_types}")
-        
+
         if self._token_type_claim:
             custom_claims = {self._token_type_claim_name: token_types[type_token]}
         else:
             custom_claims = {}
         logger.debug(f"Custom claims: {custom_claims}")
-        
+
         # for access_token only fresh needed
         if type_token == "access":
             custom_claims["fresh"] = fresh
         logger.debug(f"Custom claims after fresh check: {custom_claims}")
-        
+
         # if cookie in token location and csrf protection enabled
         if self.jwt_in_cookies and self._cookie_csrf_protect:
             custom_claims["csrf"] = self._get_jwt_identifier()
         logger.debug(f"Custom claims after CSRF check: {custom_claims}")
-        
+
         if exp_time:
             reserved_claims["exp"] = exp_time
         logger.debug(f"Reserved claims after exp_time check: {reserved_claims}")
-        
+
         if issuer:
             reserved_claims["iss"] = issuer
         logger.debug(f"Reserved claims after issuer check: {reserved_claims}")
-        
+
         if audience:
             reserved_claims["aud"] = audience
         logger.debug(f"Reserved claims after audience check: {reserved_claims}")
-        
+
         algorithm = algorithm or self._algorithm
         logger.debug(f"Algorithm to be used: {algorithm}")
-        
+
         try:
             secret_key = self._get_secret_key(algorithm, "encode")
             logger.debug("Secret key retrieved successfully.")
         except Exception as e:
             logger.error(f"Error retrieving secret key: {e}")
             raise
-        
+
         token = jwt.encode(
             {**reserved_claims, **custom_claims, **user_claims},
             secret_key,
@@ -302,7 +309,7 @@ class AuthJWT(AuthConfig):
             headers=headers,
         )
         logger.debug(f"Token created successfully: {token}")
-        
+
         return token
 
     def _has_token_in_denylist_callback(self) -> bool:
@@ -377,7 +384,9 @@ class AuthJWT(AuthConfig):
                 expires_time = int(expires_time.total_seconds())
                 logger.debug(f"Expires time converted to seconds: {expires_time}")
 
-            expiration_timestamp = self._get_int_from_datetime(datetime.now(timezone.utc)) + expires_time
+            expiration_timestamp = (
+                self._get_int_from_datetime(datetime.now(timezone.utc)) + expires_time
+            )
             logger.debug(f"Expiration timestamp calculated: {expiration_timestamp}")
             return expiration_timestamp
         else:
@@ -401,7 +410,9 @@ class AuthJWT(AuthConfig):
         :return: hash token
         """
         logger.debug("Creating access token")
-        logger.debug(f"Subject: {subject}, Fresh: {fresh}, Algorithm: {algorithm}, Headers: {headers}, Expires time: {expires_time}, Audience: {audience}, User claims: {user_claims}")
+        logger.debug(
+            f"Subject: {subject}, Fresh: {fresh}, Algorithm: {algorithm}, Headers: {headers}, Expires time: {expires_time}, Audience: {audience}, User claims: {user_claims}"
+        )
 
         exp_time = self._get_expired_time("access", expires_time)
         logger.debug(f"Calculated expiration time: {exp_time}")
@@ -436,7 +447,9 @@ class AuthJWT(AuthConfig):
         :return: hash token
         """
         logger.debug("Creating refresh token")
-        logger.debug(f"Subject: {subject}, Algorithm: {algorithm}, Headers: {headers}, Expires time: {expires_time}, Audience: {audience}, User claims: {user_claims}")
+        logger.debug(
+            f"Subject: {subject}, Algorithm: {algorithm}, Headers: {headers}, Expires time: {expires_time}, Audience: {audience}, User claims: {user_claims}"
+        )
 
         exp_time = self._get_expired_time("refresh", expires_time)
         logger.debug(f"Calculated expiration time: {exp_time}")
@@ -470,7 +483,9 @@ class AuthJWT(AuthConfig):
         :return: dictionary with access and refresh tokens
         """
         logger.debug("Creating pair of tokens")
-        logger.debug(f"Subject: {subject}, Fresh: {fresh}, Algorithm: {algorithm}, Headers: {headers}, Expires time: {expires_time}, Audience: {audience}, User claims: {user_claims}")
+        logger.debug(
+            f"Subject: {subject}, Fresh: {fresh}, Algorithm: {algorithm}, Headers: {headers}, Expires time: {expires_time}, Audience: {audience}, User claims: {user_claims}"
+        )
 
         pair_identifier = {"aid": str(uuid4())}
         logger.debug(f"Generated pair identifier: {pair_identifier}")
@@ -528,7 +543,9 @@ class AuthJWT(AuthConfig):
         :param max_age: The max age of the cookie value should be the number of seconds (integer)
         """
         logger.debug("Setting access cookies")
-        logger.debug(f"Encoded access token: {encoded_access_token}, Response: {response}, Max age: {max_age}")
+        logger.debug(
+            f"Encoded access token: {encoded_access_token}, Response: {response}, Max age: {max_age}"
+        )
 
         if not self.jwt_in_cookies:
             logger.warning("JWT in cookies is not enabled")
@@ -562,7 +579,9 @@ class AuthJWT(AuthConfig):
 
         # If enabled, set the csrf double submit access cookie
         if self._cookie_csrf_protect:
-            logger.debug("CSRF protection is enabled, setting CSRF token in a separate cookie")
+            logger.debug(
+                "CSRF protection is enabled, setting CSRF token in a separate cookie"
+            )
             response.set_cookie(
                 self._access_csrf_cookie_key,
                 self._get_csrf_token(encoded_access_token),
@@ -576,11 +595,11 @@ class AuthJWT(AuthConfig):
             logger.debug("CSRF token cookie set")
 
     def set_refresh_cookies(
-            self,
-            encoded_refresh_token: str,
-            response: Optional[Response] = None,
-            max_age: Optional[int] = None,
-        ) -> None:
+        self,
+        encoded_refresh_token: str,
+        response: Optional[Response] = None,
+        max_age: Optional[int] = None,
+    ) -> None:
         """
         Configures the response to set refresh token in a cookie.
         this will also set the CSRF double submit values in a separate cookie
@@ -638,11 +657,11 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished setting the refresh cookies")
 
     def set_pair_cookies(
-            self,
-            encoded_pair_token: str,
-            response: Optional[Response] = None,
-            max_age: Optional[int] = None,
-        ) -> None:
+        self,
+        encoded_pair_token: str,
+        response: Optional[Response] = None,
+        max_age: Optional[int] = None,
+    ) -> None:
         """
         Configures the response to set access AND refresh token in a cookie.
         this will also set the CSRF double submit values in a separate cookie
@@ -813,10 +832,10 @@ class AuthJWT(AuthConfig):
             )
 
     def _verify_and_get_jwt_optional_in_cookies(
-            self,
-            request: Union[HTTPConnection, WebSocket],
-            csrf_token: Optional[str] = None,
-        ) -> "AuthJWT":
+        self,
+        request: Union[HTTPConnection, WebSocket],
+        csrf_token: Optional[str] = None,
+    ) -> "AuthJWT":
         """
         - Optionally check if cookies have a valid access token. If an access token is present in
         cookies, self._token will be set.
@@ -831,7 +850,9 @@ class AuthJWT(AuthConfig):
         logger.debug("csrf_token: %s", csrf_token)
 
         if not isinstance(request, (HTTPConnection, WebSocket)):
-            logger.error("request must be an instance of 'HTTPConnection' or 'WebSocket'")
+            logger.error(
+                "request must be an instance of 'HTTPConnection' or 'WebSocket'"
+            )
             raise TypeError(
                 "request must be an instance of 'HTTPConnection' or 'WebSocket'"
             )
@@ -882,12 +903,12 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished optionally verifying and getting JWT from cookies")
 
     def _verify_and_get_jwt_in_cookies(
-            self,
-            type_token: str,
-            request: Union[HTTPConnection, WebSocket],
-            csrf_token: Optional[str] = None,
-            fresh: Optional[bool] = False,
-        ) -> "AuthJWT":
+        self,
+        type_token: str,
+        request: Union[HTTPConnection, WebSocket],
+        csrf_token: Optional[str] = None,
+        fresh: Optional[bool] = False,
+    ) -> "AuthJWT":
         """
         - Check if cookies have a valid access or refresh token. If there is a token present in
         cookies, self._token will be set.
@@ -910,7 +931,9 @@ class AuthJWT(AuthConfig):
             logger.error("type_token must be 'access' or 'refresh'")
             raise ValueError("type_token must be 'access' or 'refresh'")
         if not isinstance(request, (HTTPConnection, WebSocket)):
-            logger.error("request must be an instance of 'HTTPConnection' or 'WebSocket'")
+            logger.error(
+                "request must be an instance of 'HTTPConnection' or 'WebSocket'"
+            )
             raise TypeError(
                 "request must be an instance of 'HTTPConnection' or 'WebSocket'"
             )
@@ -924,13 +947,17 @@ class AuthJWT(AuthConfig):
             logger.debug("Setting cookie_key to '_access_cookie_key'")
             cookie_key = self._access_cookie_key
             if not isinstance(request, WebSocket):
-                logger.debug("Setting csrf_token to 'request.headers.get(self._access_csrf_header_name)'")
+                logger.debug(
+                    "Setting csrf_token to 'request.headers.get(self._access_csrf_header_name)'"
+                )
                 csrf_token = request.headers.get(self._access_csrf_header_name)
         if type_token == "refresh":
             logger.debug("Setting cookie_key to '_refresh_cookie_key'")
             cookie_key = self._refresh_cookie_key
             if not isinstance(request, WebSocket):
-                logger.debug("Setting csrf_token to 'request.headers.get(self._refresh_csrf_header_name)'")
+                logger.debug(
+                    "Setting csrf_token to 'request.headers.get(self._refresh_csrf_header_name)'"
+                )
                 csrf_token = request.headers.get(self._refresh_csrf_header_name)
 
         logger.debug(f"cookie_key: {cookie_key}")
@@ -1011,12 +1038,12 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished verifying JWT optional in request")
 
     def _verify_jwt_in_request(
-            self,
-            token: str,
-            type_token: str,
-            token_from: str,
-            fresh: Optional[bool] = False,
-        ) -> None:
+        self,
+        token: str,
+        type_token: str,
+        token_from: str,
+        fresh: Optional[bool] = False,
+    ) -> None:
         """
         Ensure that the requester has a valid token. This also check the freshness of the access token
 
@@ -1026,7 +1053,13 @@ class AuthJWT(AuthConfig):
         :param fresh: check freshness token if True
         """
         logger.debug("Verifying JWT in request")
-        logger.debug("token: %s, type_token: %s, token_from: %s, fresh: %s", token, type_token, token_from, fresh)
+        logger.debug(
+            "token: %s, type_token: %s, token_from: %s, fresh: %s",
+            token,
+            type_token,
+            token_from,
+            fresh,
+        )
 
         if type_token not in ["access", "refresh"]:
             logger.error("Invalid type_token: %s", type_token)
@@ -1079,8 +1112,8 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished verifying JWT in request")
 
     def _verifying_token(
-            self, encoded_token: str, issuer: Optional[str] = None
-        ) -> None:
+        self, encoded_token: str, issuer: Optional[str] = None
+    ) -> None:
         """
         Verify for a valid token then verify is not revoked.
 
@@ -1107,8 +1140,8 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished verifying token")
 
     def _verified_token(
-            self, encoded_token: str, issuer: Optional[str] = None
-        ) -> Dict[str, Union[str, int, bool]]:
+        self, encoded_token: str, issuer: Optional[str] = None
+    ) -> Dict[str, Union[str, int, bool]]:
         """
         Verified token and catch all error from jwt package and return decode token
 
@@ -1185,14 +1218,14 @@ class AuthJWT(AuthConfig):
                     raise ClaimsRequired(status_code=422, message="Missing claim: team")
 
     def jwt_required(
-            self,
-            auth_from: str = "request",
-            token: Optional[str] = None,
-            websocket: Optional[WebSocket] = None,
-            csrf_token: Optional[str] = None,
-            roles: list = [],
-            claims: list = [],
-        ) -> None:
+        self,
+        auth_from: str = "request",
+        token: Optional[str] = None,
+        websocket: Optional[WebSocket] = None,
+        csrf_token: Optional[str] = None,
+        roles: list = [],
+        claims: list = [],
+    ) -> None:
         """
         Only access token can access this function
 
@@ -1202,8 +1235,15 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token. Since WebSocket cannot add specific additional headers, it must pass csrf_token manually to achieve a Query Url or Path
         """
         logger.debug("Protected as: JWT Required")
-        logger.debug("auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
-                    auth_from, token, websocket, csrf_token, roles, claims)
+        logger.debug(
+            "auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
+            auth_from,
+            token,
+            websocket,
+            csrf_token,
+            roles,
+            claims,
+        )
 
         self._required_claims = claims
         self._required_roles = roles
@@ -1235,14 +1275,14 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished eval protection for: JWT Required")
 
     def jwt_optional(
-            self,
-            auth_from: str = "request",
-            token: Optional[str] = None,
-            websocket: Optional[WebSocket] = None,
-            csrf_token: Optional[str] = None,
-            roles: list = [],
-            claims: list = [],
-        ) -> None:
+        self,
+        auth_from: str = "request",
+        token: Optional[str] = None,
+        websocket: Optional[WebSocket] = None,
+        csrf_token: Optional[str] = None,
+        roles: list = [],
+        claims: list = [],
+    ) -> None:
         """
         If an access token in present in the request you can get data from get_raw_jwt() or get_jwt_subject(),
         If no access token is present in the request, this endpoint will still be called, but
@@ -1256,14 +1296,23 @@ class AuthJWT(AuthConfig):
                         its must be passing csrf_token manually and can achieve by Query Url or Path
         """
         logger.debug("Protected as: JWT Optional")
-        logger.debug("auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
-                    auth_from, token, websocket, csrf_token, roles, claims)
+        logger.debug(
+            "auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
+            auth_from,
+            token,
+            websocket,
+            csrf_token,
+            roles,
+            claims,
+        )
 
         self._required_claims = claims
         self._required_roles = roles
         if auth_from == "websocket":
             if websocket:
-                logger.debug("Verifying and getting optional JWT in cookies for websocket")
+                logger.debug(
+                    "Verifying and getting optional JWT in cookies for websocket"
+                )
                 self._verify_and_get_jwt_optional_in_cookies(websocket, csrf_token)
             else:
                 logger.debug("Verifying optional JWT in request for websocket")
@@ -1289,14 +1338,14 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished eval protection for: JWT Optional")
 
     def jwt_refresh_token_required(
-            self,
-            auth_from: str = "request",
-            token: Optional[str] = None,
-            websocket: Optional[WebSocket] = None,
-            csrf_token: Optional[str] = None,
-            roles: list = [],
-            claims: list = [],
-        ) -> None:
+        self,
+        auth_from: str = "request",
+        token: Optional[str] = None,
+        websocket: Optional[WebSocket] = None,
+        csrf_token: Optional[str] = None,
+        roles: list = [],
+        claims: list = [],
+    ) -> None:
         """
         This function will ensure that the requester has a valid refresh token
         :param auth_from: for identity get token from HTTP or WebSocket
@@ -1307,8 +1356,15 @@ class AuthJWT(AuthConfig):
                         its must be passing csrf_token manually and can achieve by Query Url or Path
         """
         logger.debug("Protected as: JWT Refresh Token Required")
-        logger.debug("auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
-                    auth_from, token, websocket, csrf_token, roles, claims)
+        logger.debug(
+            "auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
+            auth_from,
+            token,
+            websocket,
+            csrf_token,
+            roles,
+            claims,
+        )
 
         self._required_claims = claims
         self._required_roles = roles
@@ -1340,14 +1396,14 @@ class AuthJWT(AuthConfig):
         logger.debug("Finished eval protection for: JWT Refresh Token Required")
 
     def fresh_jwt_required(
-            self,
-            auth_from: str = "request",
-            token: Optional[str] = None,
-            websocket: Optional[WebSocket] = None,
-            csrf_token: Optional[str] = None,
-            roles: list = [],
-            claims: list = [],
-        ) -> None:
+        self,
+        auth_from: str = "request",
+        token: Optional[str] = None,
+        websocket: Optional[WebSocket] = None,
+        csrf_token: Optional[str] = None,
+        roles: list = [],
+        claims: list = [],
+    ) -> None:
         """
         This function will ensure that the requester has a valid access token and fresh token
         :param auth_from: for identity get token from HTTP or WebSocket
@@ -1358,15 +1414,24 @@ class AuthJWT(AuthConfig):
                         its must be passing csrf_token manually and can achieve by Query Url or Path
         """
         logger.debug("Protected as: Fresh JWT Token Required")
-        logger.debug("auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
-                    auth_from, token, websocket, csrf_token, roles, claims)
+        logger.debug(
+            "auth_from: %s, token: %s, websocket: %s, csrf_token: %s, roles: %s, claims: %s",
+            auth_from,
+            token,
+            websocket,
+            csrf_token,
+            roles,
+            claims,
+        )
 
         self._required_claims = claims
         self._required_roles = roles
         if auth_from == "websocket":
             if websocket:
                 logger.debug("Verifying and getting JWT in cookies for websocket")
-                self._verify_and_get_jwt_in_cookies("access", websocket, csrf_token, True)
+                self._verify_and_get_jwt_in_cookies(
+                    "access", websocket, csrf_token, True
+                )
             else:
                 logger.debug("Verifying JWT in request for websocket")
                 self._verify_jwt_in_request(token, "access", "websocket", True)
@@ -1378,7 +1443,9 @@ class AuthJWT(AuthConfig):
                     self._verify_jwt_in_request(self._token, "access", "headers", True)
                 if not self._token and self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT in cookies")
-                    self._verify_and_get_jwt_in_cookies("access", self._request, fresh=True)
+                    self._verify_and_get_jwt_in_cookies(
+                        "access", self._request, fresh=True
+                    )
             else:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self.jwt_in_headers:
@@ -1386,7 +1453,9 @@ class AuthJWT(AuthConfig):
                     self._verify_jwt_in_request(self._token, "access", "headers", True)
                 if self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT in cookies")
-                    self._verify_and_get_jwt_in_cookies("access", self._request, fresh=True)
+                    self._verify_and_get_jwt_in_cookies(
+                        "access", self._request, fresh=True
+                    )
 
         logger.debug("Finished eval protection for: Fresh JWT Token Required")
 
