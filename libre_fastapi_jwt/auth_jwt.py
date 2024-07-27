@@ -30,7 +30,10 @@ from libre_fastapi_jwt.exceptions import (
 
 class AuthJWT(AuthConfig):
     def __init__(
-        self, req: HTTPConnection = None, res: Response = None, token: str = Header(None)
+        self,
+        req: HTTPConnection = None,
+        res: Response = None,
+        token: str = Header(None),
     ):
         """
         Get jwt header from incoming request or get
@@ -675,7 +678,7 @@ class AuthJWT(AuthConfig):
     ) -> "AuthJWT":
         """
         - Optionally check if cookies have a valid access token. If an access token is present in
-        cookies, self._token will be set. 
+        cookies, self._token will be set.
         - Raise an exception error when an access token is invalid
         or doesn't match the double submitted CSRF token.
 
@@ -683,7 +686,9 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token
         """
         if not isinstance(request, (HTTPConnection, WebSocket)):
-            raise TypeError("request must be an instance of 'HTTPConnection' or 'WebSocket'")
+            raise TypeError(
+                "request must be an instance of 'HTTPConnection' or 'WebSocket'"
+            )
 
         cookie_key = self._access_cookie_key
         cookie = request.cookies.get(cookie_key)
@@ -691,7 +696,10 @@ class AuthJWT(AuthConfig):
             csrf_token = request.headers.get(self._access_csrf_header_name)
 
         if cookie and self._cookie_csrf_protect and not csrf_token:
-            if isinstance(request, WebSocket) or request.scope['method'] in self._csrf_methods:
+            if (
+                isinstance(request, WebSocket)
+                or request.scope["method"] in self._csrf_methods
+            ):
                 raise CSRFError(status_code=401, message="Missing CSRF Token")
 
         # set token from cookie and verify jwt
@@ -701,7 +709,10 @@ class AuthJWT(AuthConfig):
         decoded_token = self.get_raw_jwt()
 
         if decoded_token and self._cookie_csrf_protect and csrf_token:
-            if isinstance(request, WebSocket) or request.scope['method'] in self._csrf_methods:
+            if (
+                isinstance(request, WebSocket)
+                or request.scope["method"] in self._csrf_methods
+            ):
                 if "csrf" not in decoded_token:
                     raise JWTDecodeError(status_code=422, message="Missing claim: csrf")
                 if not hmac.compare_digest(csrf_token, decoded_token["csrf"]):
@@ -733,7 +744,9 @@ class AuthJWT(AuthConfig):
         if type_token not in ["access", "refresh"]:
             raise ValueError("type_token must be between 'access' or 'refresh'")
         if not isinstance(request, (HTTPConnection, WebSocket)):
-            raise TypeError("request must be an instance of 'HTTPConnection' or 'WebSocket'")
+            raise TypeError(
+                "request must be an instance of 'HTTPConnection' or 'WebSocket'"
+            )
 
         # Initialize cookie_key with a default value
         cookie_key = None
@@ -752,11 +765,15 @@ class AuthJWT(AuthConfig):
         cookie = request.cookies.get(cookie_key)
         if not cookie:
             raise MissingTokenError(
-                status_code=401, message="Missing or incorrect cookie. Expected: {}".format(cookie_key)
+                status_code=401,
+                message="Missing or incorrect cookie. Expected: {}".format(cookie_key),
             )
 
         if self._cookie_csrf_protect and not csrf_token:
-            if isinstance(request, WebSocket) or request.scope['method'] in self._csrf_methods:
+            if (
+                isinstance(request, WebSocket)
+                or request.scope["method"] in self._csrf_methods
+            ):
                 raise CSRFError(status_code=401, message="Missing CSRF Token")
 
         # set token from cookie and verify jwt
@@ -766,7 +783,10 @@ class AuthJWT(AuthConfig):
         decoded_token = self.get_raw_jwt()
 
         if self._cookie_csrf_protect and csrf_token:
-            if isinstance(request, WebSocket) or request.scope['method'] in self._csrf_methods:
+            if (
+                isinstance(request, WebSocket)
+                or request.scope["method"] in self._csrf_methods
+            ):
                 if "csrf" not in decoded_token:
                     raise JWTDecodeError(status_code=422, message="Missing claim: csrf")
                 if not hmac.compare_digest(csrf_token, decoded_token["csrf"]):
@@ -1131,6 +1151,7 @@ class AuthJWT(AuthConfig):
         encoded_token = encoded_token or self._token
 
         return jwt.get_unverified_header(encoded_token)
+
 
 class AuthJWTBearer(HTTPBase):
     def __init__(
