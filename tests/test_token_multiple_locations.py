@@ -36,6 +36,15 @@ def client():
     def jwt_fresh(Authorize: AuthJWT = Depends()):
         Authorize.fresh_jwt_required()
         return {"hello": Authorize.get_jwt_subject()}
+    
+    @app.get("/get-accesstoken-and-refreshcookie")
+    def get_token(Authorize: AuthJWT = Depends()):
+        pair_token = Authorize.create_pair_token(subject=1)
+        access_token = pair_token["access_token"]
+        refresh_token = pair_token["access_token"]
+
+        Authorize.set_refresh_cookies(pair_token["access_token"])
+        return {"access": access_token, "refresh": refresh_token}
 
     client = TestClient(app)
     return client
@@ -80,4 +89,28 @@ def test_get_subject_through_cookie_or_headers(url, client):
     assert response.status_code == 200
     assert response.json() == {"hello": 1}
 
-    AuthJWT._token_location = {"headers"}
+
+@pytest.mark.parametrize(
+    "url", ["/jwt-refresh"]
+)
+def test_refresh_access_token_refresh_cookie(url, client):
+    @AuthJWT.load_config
+    def get_secret_key():
+        return [
+            ("authjwt_secret_key", "secret"),
+            ("authjwt_token_location", ["headers", "cookies"]),
+            ("authjwt_cookie_secure", False),
+        ]
+
+    res = client.get("/get-accesstoken-and-refreshcookie")
+    # Grab tokens from response
+    access_token = res.json()["access"]
+    refresh_token = res.json()["refresh"]
+    # Grab CSRF refresh token from cookie
+    refresh_csrf = res.cookies.get("csrf_refresh")
+
+    # Try access through cookies
+    response = client.post(url, headers={"X-CSRF-Token": refresh_csrf})
+
+    assert response.status_code == 200
+    assert response.json() == {"hello": 1}
