@@ -922,7 +922,8 @@ class AuthJWT(AuthConfig):
         """
         logger.debug("Verify and get JWT from cookies")
         logger.debug("type_token: %s", type_token)
-        logger.debug("request: %s", request)
+        request_headers = dict(request.headers)
+        logger.debug("Request Headers: %s", request_headers)
         logger.debug("csrf_token: %s", csrf_token)
         logger.debug("fresh: %s", fresh)
 
@@ -947,12 +948,10 @@ class AuthJWT(AuthConfig):
             logger.debug("Setting cookie_key to '_access_cookie_key'")
             cookie_key = self._access_cookie_key
             if not isinstance(request, WebSocket):
-                logger.debug(
-                    "Setting csrf_token to 'request.headers.get(self._access_csrf_header_name)'"
-                )
+                logger.debug(f"Setting csrf_token to {self._access_csrf_header_name}")
                 csrf_token = request.headers.get(self._access_csrf_header_name)
         if type_token == "refresh":
-            logger.debug("Setting cookie_key to '_refresh_cookie_key'")
+            logger.debug(f"Setting cookie_key to {self._refresh_cookie_key}")
             cookie_key = self._refresh_cookie_key
             if not isinstance(request, WebSocket):
                 logger.debug(
@@ -964,7 +963,7 @@ class AuthJWT(AuthConfig):
 
         # Set cookie variable, validate it is not None (aka null/empty)
         cookie = request.cookies.get(cookie_key)
-        logger.debug(f"cookie: {cookie}")
+        logger.debug(f"Cookie value is: {cookie}")
         if not cookie:
             logger.error("Missing or incorrect cookie. Expected: %s", cookie_key)
             raise MissingTokenError(
