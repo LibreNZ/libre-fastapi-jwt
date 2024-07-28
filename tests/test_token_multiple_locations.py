@@ -1,8 +1,10 @@
 import pytest
+import logging
 from libre_fastapi_jwt import AuthJWT
-from fastapi import FastAPI, Depends
-from fastapi.testclient import TestClient
+from fastapi import FastAPI, Depends, Request # type: ignore
+from fastapi.testclient import TestClient # type: ignore
 
+logging.basicConfig(level=logging.DEBUG)
 
 @pytest.fixture(scope="function")
 def client():
@@ -15,6 +17,7 @@ def client():
 
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
+        logging.debug(f"access_token: {access_token}, refresh_token: {refresh_token}")
         return {"access": access_token, "refresh": refresh_token}
 
     @app.post("/jwt-optional")
@@ -28,9 +31,20 @@ def client():
         return {"hello": Authorize.get_jwt_subject()}
 
     @app.post("/jwt-refresh")
-    def jwt_refresh(Authorize: AuthJWT = Depends()):
+    async def jwt_refresh(request: Request, Authorize: AuthJWT = Depends()):
+        # Extract request headers and body
+        request_headers = dict(request.headers)
+        request_body = await request.body()
+
+        # Log the request details
+        logging.debug(f"Request Headers: {request_headers}")
+
+        # Perform the JWT refresh token check
         Authorize.jwt_refresh_token_required()
-        return {"hello": Authorize.get_jwt_subject()}
+        response_body = {"hello": Authorize.get_jwt_subject()}
+
+        # Return all the information
+        return response_body
 
     @app.post("/jwt-fresh")
     def jwt_fresh(Authorize: AuthJWT = Depends()):
@@ -41,9 +55,10 @@ def client():
     def get_token(Authorize: AuthJWT = Depends()):
         pair_token = Authorize.create_pair_token(subject=1)
         access_token = pair_token["access_token"]
-        refresh_token = pair_token["access_token"]
+        refresh_token = pair_token["refresh_token"]
 
-        Authorize.set_refresh_cookies(pair_token["access_token"])
+        Authorize.set_refresh_cookies(refresh_token)
+        logging.debug(f"access_token: {access_token}, refresh_token: {refresh_token}")
         return {"access": access_token, "refresh": refresh_token}
 
     client = TestClient(app)
@@ -104,8 +119,8 @@ def test_refresh_access_token_refresh_cookie(url, client):
 
     res = client.get("/get-accesstoken-and-refreshcookie")
     # Grab tokens from response
-    access_token = res.json()["access"]
-    refresh_token = res.json()["refresh"]
+    #access_token = res.json()["access"]
+    #refresh_token = res.json()["refresh"]
     # Grab CSRF refresh token from cookie
     refresh_csrf = res.cookies.get("csrf_refresh")
 

@@ -145,7 +145,7 @@ class AuthJWT(AuthConfig):
         :return: plain text or RSA depends on algorithm
         """
         logger.debug(
-            f"Getting secret key for algorithm: {algorithm} and process: {process}"
+            f"Getting the secret key for JWT with algorithm: {algorithm} to perform an {process} action..."
         )
         symmetric_algorithms, asymmetric_algorithms = {
             "HS256",
@@ -1048,7 +1048,7 @@ class AuthJWT(AuthConfig):
         Ensure that the requester has a valid token. This also check the freshness of the access token
 
         :param token: The encoded JWT
-        :param type_token: indicate token is access or refresh token
+        :param type_token: indicate token is an 'access' or 'refresh' token
         :param token_from: indicate token from headers cookies, websocket
         :param fresh: check freshness token if True
         """
@@ -1123,6 +1123,7 @@ class AuthJWT(AuthConfig):
         logger.debug("Verifying token")
         logger.debug("encoded_token: %s, issuer: %s", encoded_token, issuer)
 
+        logger.debug("Calling '_verified_token()' to decode the token...")
         raw_token = self._verified_token(encoded_token, issuer)
         logger.debug("raw_token: %s", raw_token)
 
@@ -1157,7 +1158,7 @@ class AuthJWT(AuthConfig):
         logger.debug("algorithms: %s", algorithms)
 
         try:
-            logger.debug("Getting unverified JWT headers")
+            logger.debug("Calling 'get_unverified_jwt_headers()' to obtain only the headers from the JWT...")
             unverified_headers = self.get_unverified_jwt_headers(encoded_token)
             logger.debug("unverified_headers: %s", unverified_headers)
         except Exception as err:
@@ -1165,7 +1166,7 @@ class AuthJWT(AuthConfig):
             raise InvalidHeaderError(status_code=422, message=str(err))
 
         try:
-            logger.debug("Getting secret key")
+            logger.debug("Calling '_get_secret_key()' to decode the JWT...")
             secret_key = self._get_secret_key(unverified_headers["alg"], "decode")
             logger.debug("secret_key: %s", secret_key)
         except Exception as err:
@@ -1173,7 +1174,7 @@ class AuthJWT(AuthConfig):
             raise
 
         try:
-            logger.debug("Decoding JWT")
+            logger.debug("Decoding JWT...")
             decoded_token = jwt.decode(
                 encoded_token,
                 secret_key,
@@ -1506,7 +1507,7 @@ class AuthJWT(AuthConfig):
         :return: JWT header parameters as a dictionary
         """
         encoded_token = encoded_token or self._token
-        logger.debug("Getting unverified JWT headers from token: %s", encoded_token)
+        logger.debug("Getting the headers from the token: %s", encoded_token)
 
         return jwt.get_unverified_header(encoded_token)
 

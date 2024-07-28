@@ -43,7 +43,7 @@ jobs:
         shell: bash
         run: |
           echo "REPORT_FILE=${REPORT_OUTPUT}" >> "$GITHUB_ENV"
-          pytest -v --md-report --md-report-flavor gfm --md-report-exclude-outcomes passed skipped xpassed --md-report-output "$REPORT_OUTPUT"
+          pytest -o log_cli=true --log-cli-level=INFO --md-report --md-report-flavor github --md-report-output "$REPORT_OUTPUT"
 
       - name: Output reports to the job summary when tests fail
         if: failure()
