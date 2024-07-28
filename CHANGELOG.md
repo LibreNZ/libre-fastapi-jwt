@@ -1,4 +1,4 @@
-## 0.22.3
+## 0.22.4
 * Replace `Request` with `HTTPConnection`
 * Updated all dependencies
 
