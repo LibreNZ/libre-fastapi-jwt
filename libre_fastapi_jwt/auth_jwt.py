@@ -922,8 +922,13 @@ class AuthJWT(AuthConfig):
         """
         logger.debug("Verify and get JWT from cookies")
         logger.debug("type_token: %s", type_token)
-        request_headers = dict(request.headers)
-        logger.debug("Request Headers: %s", request_headers)
+        # Check if request is a valid object with headers
+        if hasattr(request, 'headers'):
+            request_headers = dict(request.headers)
+            logger.debug("Request Headers: %s", request_headers)
+        else:
+            request_headers = None  # or handle it as needed
+            logger.debug("No Request Headers.")
         logger.debug("csrf_token: %s", csrf_token)
         logger.debug("fresh: %s", fresh)
 
