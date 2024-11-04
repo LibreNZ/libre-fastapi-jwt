@@ -1,3 +1,8 @@
+## 0.22.5
+* Added logger
+* Increased DEBUG logging
+* Updated all dependencies
+
 ## 0.22.4
 * Replace `Request` with `HTTPConnection`
 * Updated all dependencies
