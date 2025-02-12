@@ -1171,8 +1171,15 @@ class AuthJWT(AuthConfig):
 
         try:
             logger.debug("Calling '_get_secret_key()' to decode the JWT...")
+            # Validate the algorithm in the header
+            if unverified_headers["alg"] not in (self._decode_algorithms or [self._algorithm]):
+                logger.error("Invalid algorithm from incoming header: %s", unverified_headers["alg"])
+                raise JWTDecodeError(status_code=422, message="Invalid algorithm on header")
             secret_key = self._get_secret_key(unverified_headers["alg"], "decode")
             logger.debug("secret_key: %s", secret_key)
+        except KeyError as err:
+            logger.error("Missing 'alg' header in JWT: %s", err)
+            raise JWTDecodeError(status_code=422, message="Missing 'alg' header")
         except Exception as err:
             logger.error("Error getting secret key: %s", err)
             raise
