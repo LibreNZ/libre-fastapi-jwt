@@ -218,7 +218,7 @@ def test_valid_aud(client, Authorize, token_aud, test_settings):
         "/refresh_token", headers={"Authorization": f"Bearer {refresh_token}"}
     )
     assert response.status_code == 200
-    assert response.json() == 1
+    assert response.json() == "1"
 
     if token_aud == ["foo", "bar", "baz"]:
         AuthJWT._decode_audience = None

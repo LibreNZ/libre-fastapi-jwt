@@ -81,7 +81,7 @@ def test_valid_header(client, Authorize):
 def test_jwt_custom_headers(Authorize):
     access_token = Authorize.create_access_token(subject="1", headers={"access": "bar"})
     refresh_token = Authorize.create_refresh_token(
-        subject=2, headers={"refresh": "foo"}
+        subject="2", headers={"refresh": "foo"}
     )
     pair_token = Authorize.create_access_token(
         subject="1", headers={"access": "bar", "refresh": "foo"}
@@ -97,7 +97,7 @@ def test_jwt_custom_headers(Authorize):
 def test_get_jwt_headers_from_request(client, Authorize):
     access_token = Authorize.create_access_token(subject="1", headers={"access": "bar"})
     refresh_token = Authorize.create_refresh_token(
-        subject=2, headers={"refresh": "foo"}
+        subject="2", headers={"refresh": "foo"}
     )
 
     response = client.get(
