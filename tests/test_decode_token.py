@@ -97,7 +97,7 @@ def test_verified_token(client, encoded_token, Authorize):
     token = jwt.encode({"some": "payload"}, "secret", algorithm="HS384")
     response = client.get("/protected", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
-    assert response.json() == {"detail": "The specified alg value is not allowed"}
+    assert response.json() == {"detail": "Invalid algorithm on header"}
 
     class SettingsTwo(BaseSettings):
         AUTHJWT_SECRET_KEY: str = "secret-key"
