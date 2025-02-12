@@ -307,7 +307,7 @@ def test_cookie_optional_protected(client):
     client.get("/access-token")
     response = client.post(url)
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
     # change csrf protect to False not check csrf token
     @AuthJWT.load_config
@@ -323,7 +323,7 @@ def test_cookie_optional_protected(client):
     client.get("/access-token")
     response = client.post(url)
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
     # missing csrf token
     @AuthJWT.load_config
@@ -349,7 +349,7 @@ def test_cookie_optional_protected(client):
 
     response = client.post(url, headers={"X-CSRF-Token": csrf_token})
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
     # missing claim csrf in token
     @AuthJWT.load_config
@@ -393,7 +393,7 @@ def test_cookie_optional_protected(client):
     # valid request
     response = client.post(url, headers={"X-CSRF": csrf_token})
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
 
 @pytest.mark.parametrize("url", ["/jwt-required", "/jwt-refresh", "/jwt-fresh"])
@@ -421,7 +421,7 @@ def test_cookie_protected(url, client):
         response = client.post(url, headers={"X-CSRF-Refresh": csrf_refresh})
 
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
     # missing csrf token
     response = client.post(url)
@@ -450,7 +450,7 @@ def test_cookie_protected(url, client):
     client.get("/all-token")
     response = client.post(url)
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
     # change request methods and not check csrf token
     @AuthJWT.load_config
@@ -464,7 +464,7 @@ def test_cookie_protected(url, client):
 
     response = client.post(url)
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
     # missing claim csrf in token
     @AuthJWT.load_config
@@ -495,4 +495,4 @@ def test_cookie_protected(url, client):
     else:
         response = client.post(url, headers={"X-CSRF-Token": csrf_refresh})
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}

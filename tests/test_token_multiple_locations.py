@@ -98,7 +98,7 @@ def test_get_subject_through_cookie_or_headers(url, client):
         )
 
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
     # access through cookies
     if url != "/jwt-refresh":
@@ -107,7 +107,7 @@ def test_get_subject_through_cookie_or_headers(url, client):
         response = client.post(url, headers={"X-CSRF-Token": refresh_csrf})
 
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
 
 @pytest.mark.parametrize(
@@ -133,7 +133,7 @@ def test_refresh_access_token_refresh_cookie(url, client):
     response = client.post(url, headers={"X-CSRF-Token": refresh_csrf})
 
     assert response.status_code == 200
-    assert response.json() == {"hello": 1}
+    assert response.json() == {"hello": "1"}
 
 
 def test_refresh_and_access_then_unset(client):
