@@ -292,7 +292,7 @@ def test_valid_asymmetric_algorithms(client, Authorize, test_settings):
         "/protected", headers={"Authorization": f"Bearer {hs256_token}"}
     )
     assert response.status_code == 422
-    assert response.json() == {"detail": "The specified alg value is not allowed"}
+    assert response.json() == {"detail": "Invalid algorithm on header"}
 
     response = client.get(
         "/protected", headers={"Authorization": f"Bearer {rs256_token}"}

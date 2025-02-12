@@ -1,3 +1,7 @@
+## 0.22.6
+* Remediated for vulnerability on weak algorithm signature
+* Bump dependencies
+
 ## 0.22.5
 * Added logger
 * Increased DEBUG logging
