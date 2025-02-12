@@ -206,14 +206,14 @@ def test_invalid_jwt_issuer(client, Authorize, test_settings):
 def test_valid_aud(client, Authorize, token_aud, test_settings):
     AuthJWT._decode_audience = ["foo", "bar"]
 
-    access_token = Authorize.create_access_token(subject=1, audience=token_aud)
+    access_token = Authorize.create_access_token(subject="1", audience=token_aud)
     response = client.get(
         "/protected", headers={"Authorization": f"Bearer {access_token}"}
     )
     assert response.status_code == 200
     assert response.json() == {"hello": "world"}
 
-    refresh_token = Authorize.create_refresh_token(subject=1, audience=token_aud)
+    refresh_token = Authorize.create_refresh_token(subject="1", audience=token_aud)
     response = client.get(
         "/refresh_token", headers={"Authorization": f"Bearer {refresh_token}"}
     )
@@ -228,14 +228,14 @@ def test_valid_aud(client, Authorize, token_aud, test_settings):
 def test_invalid_aud_and_missing_aud(client, Authorize, token_aud, test_settings):
     AuthJWT._decode_audience = "foo"
 
-    access_token = Authorize.create_access_token(subject=1, audience=token_aud)
+    access_token = Authorize.create_access_token(subject="1", audience=token_aud)
     response = client.get(
         "/protected", headers={"Authorization": f"Bearer {access_token}"}
     )
     assert response.status_code == 422
     assert response.json() == {"detail": "Audience doesn't match"}
 
-    refresh_token = Authorize.create_refresh_token(subject=1)
+    refresh_token = Authorize.create_refresh_token(subject="1")
     response = client.get(
         "/refresh_token", headers={"Authorization": f"Bearer {refresh_token}"}
     )
@@ -255,7 +255,7 @@ def test_invalid_decode_algorithms(client, Authorize, test_settings):
     def get_settings_algorithms():
         return SettingsAlgorithms()
 
-    token = Authorize.create_access_token(subject=1)
+    token = Authorize.create_access_token(subject="1")
     response = client.get("/protected", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
     assert response.json() == {"detail": "Invalid algorithm on header"}
@@ -264,7 +264,7 @@ def test_invalid_decode_algorithms(client, Authorize, test_settings):
 
 
 def test_valid_asymmetric_algorithms(client, Authorize, test_settings):
-    hs256_token = Authorize.create_access_token(subject=1)
+    hs256_token = Authorize.create_access_token(subject="1")
 
     DIR = os.path.abspath(os.path.dirname(__file__))
     private_txt = os.path.join(DIR, "private_key.txt")
@@ -286,7 +286,7 @@ def test_valid_asymmetric_algorithms(client, Authorize, test_settings):
     def get_settings_asymmetric():
         return SettingsAsymmetric()
 
-    rs256_token = Authorize.create_access_token(subject=1)
+    rs256_token = Authorize.create_access_token(subject="1")
 
     response = client.get(
         "/protected", headers={"Authorization": f"Bearer {hs256_token}"}
@@ -310,7 +310,7 @@ def test_invalid_asymmetric_algorithms(client, Authorize, test_settings):
         return SettingsAsymmetricOne()
 
     with pytest.raises(RuntimeError, match=r"authjwt_private_key"):
-        Authorize.create_access_token(subject=1)
+        Authorize.create_access_token(subject="1")
 
     DIR = os.path.abspath(os.path.dirname(__file__))
     private_txt = os.path.join(DIR, "private_key.txt")
@@ -326,7 +326,7 @@ def test_invalid_asymmetric_algorithms(client, Authorize, test_settings):
     def get_settings_asymmetric_two():
         return SettingsAsymmetricTwo()
 
-    token = Authorize.create_access_token(subject=1)
+    token = Authorize.create_access_token(subject="1")
     with pytest.raises(RuntimeError, match=r"authjwt_public_key"):
         client.get("/protected", headers={"Authorization": f"Bearer {token}"})
 

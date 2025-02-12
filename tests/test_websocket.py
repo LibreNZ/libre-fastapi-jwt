@@ -19,8 +19,8 @@ def client():
 
     @app.get("/all-token")
     def all_token(Authorize: AuthJWT = Depends()):
-        access_token = Authorize.create_access_token(subject=1, fresh=True)
-        refresh_token = Authorize.create_refresh_token(subject=1)
+        access_token = Authorize.create_access_token(subject="1", fresh=True)
+        refresh_token = Authorize.create_refresh_token(subject="1")
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
         return {"msg": "all token"}

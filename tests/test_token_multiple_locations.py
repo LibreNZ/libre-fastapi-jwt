@@ -12,8 +12,8 @@ def client():
 
     @app.get("/get-token")
     def get_token(Authorize: AuthJWT = Depends()):
-        access_token = Authorize.create_access_token(subject=1, fresh=True)
-        refresh_token = Authorize.create_refresh_token(subject=1)
+        access_token = Authorize.create_access_token(subject="1", fresh=True)
+        refresh_token = Authorize.create_refresh_token(subject="1")
 
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
@@ -53,7 +53,7 @@ def client():
     
     @app.get("/get-accesstoken-and-refreshcookie")
     def get_token(Authorize: AuthJWT = Depends()):
-        pair_token = Authorize.create_pair_token(subject=1)
+        pair_token = Authorize.create_pair_token(subject="1")
         access_token = pair_token["access_token"]
         refresh_token = pair_token["refresh_token"]
 

@@ -79,12 +79,12 @@ def test_valid_header(client, Authorize):
 
 
 def test_jwt_custom_headers(Authorize):
-    access_token = Authorize.create_access_token(subject=1, headers={"access": "bar"})
+    access_token = Authorize.create_access_token(subject="1", headers={"access": "bar"})
     refresh_token = Authorize.create_refresh_token(
         subject=2, headers={"refresh": "foo"}
     )
     pair_token = Authorize.create_access_token(
-        subject=1, headers={"access": "bar", "refresh": "foo"}
+        subject="1", headers={"access": "bar", "refresh": "foo"}
     )
 
     assert Authorize.get_unverified_jwt_headers(access_token)["access"] == "bar"
@@ -95,7 +95,7 @@ def test_jwt_custom_headers(Authorize):
 
 
 def test_get_jwt_headers_from_request(client, Authorize):
-    access_token = Authorize.create_access_token(subject=1, headers={"access": "bar"})
+    access_token = Authorize.create_access_token(subject="1", headers={"access": "bar"})
     refresh_token = Authorize.create_refresh_token(
         subject=2, headers={"refresh": "foo"}
     )
@@ -120,7 +120,7 @@ def test_custom_header_name(client, Authorize):
     def get_header_name():
         return HeaderName()
 
-    token = Authorize.create_access_token(subject=1)
+    token = Authorize.create_access_token(subject="1")
     # Insure 'default' headers no longer work
     response = client.get("/protected", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 401
@@ -150,7 +150,7 @@ def test_custom_header_type(client, Authorize):
     def get_header_type():
         return HeaderType()
 
-    token = Authorize.create_access_token(subject=1)
+    token = Authorize.create_access_token(subject="1")
     # Insure 'default' headers no longer work
     response = client.get("/protected", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422

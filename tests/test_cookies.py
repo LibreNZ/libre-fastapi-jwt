@@ -18,16 +18,16 @@ def client():
 
     @app.get("/all-token")
     def all_token(Authorize: AuthJWT = Depends()):
-        access_token = Authorize.create_access_token(subject=1, fresh=True)
-        refresh_token = Authorize.create_refresh_token(subject=1)
+        access_token = Authorize.create_access_token(subject="1", fresh=True)
+        refresh_token = Authorize.create_refresh_token(subject="1")
         Authorize.set_access_cookies(access_token)
         Authorize.set_refresh_cookies(refresh_token)
         return {"msg": "all token"}
 
     @app.get("/all-token-response")
     def all_token_response(Authorize: AuthJWT = Depends()):
-        access_token = Authorize.create_access_token(subject=1, fresh=True)
-        refresh_token = Authorize.create_refresh_token(subject=1)
+        access_token = Authorize.create_access_token(subject="1", fresh=True)
+        refresh_token = Authorize.create_refresh_token(subject="1")
         response = JSONResponse(content={"msg": "all token"})
         Authorize.set_access_cookies(access_token, response)
         Authorize.set_refresh_cookies(refresh_token, response)
@@ -35,26 +35,26 @@ def client():
 
     @app.get("/access-token")
     def access_token(Authorize: AuthJWT = Depends()):
-        access_token = Authorize.create_access_token(subject=1)
+        access_token = Authorize.create_access_token(subject="1")
         Authorize.set_access_cookies(access_token)
         return {"msg": "access token"}
 
     @app.get("/access-token-response")
     def access_token_response(Authorize: AuthJWT = Depends()):
-        access_token = Authorize.create_access_token(subject=1)
+        access_token = Authorize.create_access_token(subject="1")
         response = JSONResponse(content={"msg": "access token"})
         Authorize.set_access_cookies(access_token, response)
         return response
 
     @app.get("/refresh-token")
     def refresh_token(Authorize: AuthJWT = Depends()):
-        refresh_token = Authorize.create_refresh_token(subject=1)
+        refresh_token = Authorize.create_refresh_token(subject="1")
         Authorize.set_refresh_cookies(refresh_token)
         return {"msg": "refresh token"}
 
     @app.get("/refresh-token-response")
     def refresh_token_response(Authorize: AuthJWT = Depends()):
-        refresh_token = Authorize.create_refresh_token(subject=1)
+        refresh_token = Authorize.create_refresh_token(subject="1")
         response = JSONResponse(content={"msg": "refresh token"})
         Authorize.set_refresh_cookies(refresh_token, response)
         return response
@@ -123,7 +123,7 @@ def test_set_cookie_not_valid_type_max_age(Authorize):
             ("authjwt_secret_key", "secret"),
         ]
 
-    token = Authorize.create_access_token(subject=1)
+    token = Authorize.create_access_token(subject="1")
 
     with pytest.raises(TypeError, match=r"max_age"):
         Authorize.set_access_cookies(token, max_age="string")
@@ -140,7 +140,7 @@ def test_set_unset_cookies_not_valid_type_response(Authorize):
             ("authjwt_secret_key", "secret"),
         ]
 
-    token = Authorize.create_access_token(subject=1)
+    token = Authorize.create_access_token(subject="1")
 
     with pytest.raises(TypeError, match=r"response"):
         Authorize.set_access_cookies(token, response={"msg": "hello"})

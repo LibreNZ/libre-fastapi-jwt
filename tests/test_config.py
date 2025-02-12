@@ -77,10 +77,10 @@ def test_token_expired_false(Authorize):
     def get_expired_false():
         return TokenFalse()
 
-    access_token = Authorize.create_access_token(subject=1)
+    access_token = Authorize.create_access_token(subject="1")
     assert "exp" not in jwt.decode(access_token, "testing", algorithms="HS256")
 
-    refresh_token = Authorize.create_refresh_token(subject=1)
+    refresh_token = Authorize.create_refresh_token(subject="1")
     assert "exp" not in jwt.decode(refresh_token, "testing", algorithms="HS256")
 
 
@@ -91,7 +91,7 @@ def test_secret_key_not_exist(client, Authorize):
         Authorize.create_access_token(subject="test")
 
     Authorize._secret_key = "secret"
-    token = Authorize.create_access_token(subject=1)
+    token = Authorize.create_access_token(subject="1")
     Authorize._secret_key = None
 
     with pytest.raises(RuntimeError, match=r"authjwt_secret_key"):

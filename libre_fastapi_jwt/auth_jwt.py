@@ -200,7 +200,7 @@ class AuthJWT(AuthConfig):
 
     def _create_token(
         self,
-        subject: Union[str, int],
+        subject: str,
         type_token: str,
         exp_time: Optional[int],
         fresh: Optional[bool] = False,
@@ -395,7 +395,7 @@ class AuthJWT(AuthConfig):
 
     def create_access_token(
         self,
-        subject: Union[str, int],
+        subject: str,
         fresh: Optional[bool] = False,
         algorithm: Optional[str] = None,
         headers: Optional[Dict] = None,
@@ -433,7 +433,7 @@ class AuthJWT(AuthConfig):
 
     def create_refresh_token(
         self,
-        subject: Union[str, int],
+        subject: str,
         algorithm: Optional[str] = None,
         headers: Optional[Dict] = None,
         expires_time: Optional[Union[timedelta, int, bool]] = None,
@@ -468,7 +468,7 @@ class AuthJWT(AuthConfig):
 
     def create_pair_token(
         self,
-        subject: Union[str, int],
+        subject: str,
         fresh: Optional[bool] = False,
         algorithm: Optional[str] = None,
         headers: Optional[Dict] = None,
