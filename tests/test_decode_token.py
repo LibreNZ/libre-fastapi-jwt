@@ -258,7 +258,7 @@ def test_invalid_decode_algorithms(client, Authorize, test_settings):
     token = Authorize.create_access_token(subject=1)
     response = client.get("/protected", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 422
-    assert response.json() == {"detail": "The specified alg value is not allowed"}
+    assert response.json() == {"detail": "Invalid algorithm on header"}
 
     AuthJWT._decode_algorithms = None
 
