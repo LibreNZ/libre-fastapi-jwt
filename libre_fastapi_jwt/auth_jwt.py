@@ -198,6 +198,20 @@ class AuthJWT(AuthConfig):
 
         return str(f"{process} failed")
 
+    def get_public_key(self) -> str:
+        """
+        Return the public key
+        
+        :return: The public key as a string
+        """
+        logger.debug("Getting public key for JWT signature...")
+        
+        if not self._public_key:
+            raise RuntimeError(
+                "authjwt_public_key must be set when using asymmetric algorithm"
+            )
+        return self._public_key
+
     def _create_token(
         self,
         subject: str,

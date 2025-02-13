@@ -1,3 +1,6 @@
+## 0.22.7
+* Add `get_public_key()` function to facilitate JWKS like endpoints
+
 ## 0.22.6
 * Remediated for vulnerability on weak algorithm signature
 * Bump dependencies
