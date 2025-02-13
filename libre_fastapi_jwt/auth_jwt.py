@@ -198,19 +198,54 @@ class AuthJWT(AuthConfig):
 
         return str(f"{process} failed")
 
-    def get_public_key(self) -> str:
+    def get_public_key(self) -> tuple[str, str]:
         """
-        Return the public key
+        Return the public key and its thumbprint
         
-        :return: The public key as a string
+        :return: A tuple containing (public_key, thumbprint)
+        :raises RuntimeError: If public key is not configured
         """
-        logger.debug("Getting public key for JWT signature...")
+        logger.debug("Getting public key and its thumbprint...")
         
         if not self._public_key:
             raise RuntimeError(
-                "authjwt_public_key must be set when using asymmetric algorithm"
+                "authjwt_public_key must be set to use an asymmetric algorithm"
             )
-        return self._public_key
+
+        try:
+            from cryptography.hazmat.primitives import hashes
+            from cryptography.hazmat.primitives.serialization import load_pem_public_key
+            from cryptography.hazmat.backends import default_backend
+            from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+            import base64
+
+            # Load the public key
+            if isinstance(self._public_key, str):
+                public_key_bytes = self._public_key.encode('utf-8')
+            else:
+                public_key_bytes = self._public_key
+
+            pub_key = load_pem_public_key(public_key_bytes, backend=default_backend())
+
+            # Get the DER-encoded public key
+            der_encoded = pub_key.public_bytes(
+                encoding=Encoding.DER,
+                format=PublicFormat.SubjectPublicKeyInfo
+            )
+
+            # Compute SHA-256 thumbprint
+            digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
+            digest.update(der_encoded)
+            thumbprint = digest.finalize()
+
+            # Base64 URL encode the thumbprint
+            thumbprint_str = base64.urlsafe_b64encode(thumbprint).decode('utf-8').rstrip('=')
+
+            return self._public_key, thumbprint_str
+
+        except Exception as e:
+            logger.error(f"Error generating thumbprint: {e}")
+            raise RuntimeError("Failed to generate public key thumbprint") from e
 
     def _create_token(
         self,
@@ -305,6 +340,18 @@ class AuthJWT(AuthConfig):
         if audience:
             reserved_claims["aud"] = audience
         logger.debug(f"Reserved claims after audience check: {reserved_claims}")
+
+        # Add kid claim from public key thumbprint
+        try:
+            # Get thumbprint directly, ignoring the public key
+            _, thumbprint = self.get_public_key()
+            reserved_claims["kid"] = thumbprint
+            logger.debug(f"Added kid claim from public key thumbprint: {thumbprint}")
+        except RuntimeError as e:
+            logger.warning(f"Could not obtain kid claim. Potentially because AuthJWT is not using asymmetric encryption. Error was: {e}")
+            # Fallback to a default kid if public key is not available
+            reserved_claims["kid"] = "whoamikidding"
+            logger.debug("Defaulting kid claim")
 
         algorithm = algorithm or self._algorithm
         logger.debug(f"Algorithm to be used: {algorithm}")

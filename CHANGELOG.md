@@ -1,3 +1,7 @@
+## 0.22.8
+* Add "kid" claim to tokens when asymmetric encryption is used
+* Provide public key thumbprint to be used as "kid" claim by consumer programs
+
 ## 0.22.7
 * Add `get_public_key()` function to facilitate JWKS like endpoints
 

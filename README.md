@@ -15,20 +15,21 @@
 **Source Code**: <a href="https://github.com/LibreNZ/libre-fastapi-jwt" target="_blank">https://github.com/LibreNZ/libre-fastapi-jwt</a>
 
 ---
->This project was originally based on <a href="https://github.com/IndominusByte/fastapi-jwt-auth" target="_blank">fastapi-jwt-auth</a> 
+>This project was originally based on <a href="https://github.com/IndominusByte/fastapi-jwt-auth" target="_blank">fastapi-jwt-auth</a> . It has now been extensively modified and kept up to date.
 ---
 
 ## Features
-FastAPI extension that provides JWT Auth support (secure, easy to use and lightweight), if you were familiar with flask-jwt-extended this extension suitable for you, cause this extension inspired by flask-jwt-extended 😀
+A FastAPI extension that provides JWT authentication support (secure, easy to use and lightweight), if you were familiar with flask-jwt-extended this extension suitable for you, it was originally inspired by flask-jwt-extended 😀
 
-- Integrated with the <img src="docs/image.png" alt="drawing" width="100" style="align: center; margin: auto; "/> button
+- Integrated with the <img src="docs/image.png" alt="drawing" width="100" style="align: center; margin: auto; "/> button of OpenAPI
 - Access tokens and refresh tokens
 - Freshness Tokens
 - Revoking Tokens
 - Dual Tokens (cookie and headers)
-- Support for WebSocket authorization
+- Support for WebSocket auth
 - Support for adding custom claims to JSON Web Tokens
 - Storing tokens in cookies and CSRF protection
+- Support for JWKS endpoints for 3rd party token validation
 
 ## Installation
 The easiest way to start working with this extension with pip
@@ -37,10 +38,12 @@ The easiest way to start working with this extension with pip
 pip install libre-fastapi-jwt
 ```
 
-If you want to use asymmetric (public/private) key signing algorithms, include the <b>asymmetric</b> extra requirements.
+### Use of RSA/EC keys (recommended)
+To use asymmetric (public/private) key signing algorithms, include the <b>asymmetric</b> extra requirements.
 ```bash
 pip install 'libre-fastapi-jwt[asymmetric]'
 ```
+
 
 ## License
 This project is licensed under the terms of the MIT license.
