@@ -1,3 +1,9 @@
+## 0.23.1
+* Make `jwt_required`, `jwt_optional`, `jwt_refresh_token_required`, and `fresh_jwt_required` async
+* Add test coverage for async methods
+* Update dependencies
+* Remediated CodeQL issues
+
 ## 0.23.0 (BREAKING)
 * **Breaking:** Move `kid` from JWT payload body to JOSE header per RFC 7515 §4.1. Consumers that previously read `kid` from decoded token claims must now read it from the JWT header (e.g., `jwt.get_unverified_header(token)["kid"]`).
 * Add `authjwt_decode_kid` config option for optional `kid` validation during token verification

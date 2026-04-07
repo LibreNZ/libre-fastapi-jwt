@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "libre-fastapi-jwt"
-version = "0.23.0"
+version = "0.23.1"
 description = "Yet another fork of fast-jwt-auth"
 authors = ["Libre NZ <github-support@libre.nz>"]
 license = "MIT"
@@ -25,21 +25,21 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.12.0,<4.0"
-PyJWT = "^2.10.1"
-fastapi = ">=0.115.8"
-cryptography = ">=44.0.1"
+PyJWT = "^2.12.1"
+fastapi = ">=0.135.3"
+cryptography = ">=46.0.6"
 httpx = ">=0.28.1"
-pydantic-settings = "^2.7.1"
+pydantic-settings = "^2.13.1"
 
 
 [tool.poetry.dev-dependencies]
 poetry-plugin-up = "^0.9.0"
-pytest = "^8.3.4"
-requests = ">=2.32.3"
-pytest-cov = "^6.0.0"
-uvicorn = ">=0.34.0"
+pytest = "^9.0.2"
+requests = ">=2.33.1"
+pytest-cov = "^7.1.0"
+uvicorn = ">=0.44.0"
 [tool.poetry.group.dev.dependencies]
-pytest-md-report = "^0.6.2"
+pytest-md-report = "^0.7.0"
 
 
 [tool.pytest.ini_options]
