@@ -341,17 +341,17 @@ class AuthJWT(AuthConfig):
             reserved_claims["aud"] = audience
         logger.debug(f"Reserved claims after audience check: {reserved_claims}")
 
-        # Add kid claim from public key thumbprint
+        # Add kid to JOSE header per RFC 7515 §4.1
+        if headers is None:
+            headers = {}
         try:
-            # Get thumbprint directly, ignoring the public key
             _, thumbprint = self.get_public_key()
-            reserved_claims["kid"] = thumbprint
-            logger.debug(f"Added kid claim from public key thumbprint: {thumbprint}")
+            headers["kid"] = thumbprint
+            logger.debug(f"Added kid to JOSE header from public key thumbprint: {thumbprint}")
         except RuntimeError as e:
-            logger.warning(f"Could not obtain kid claim. Potentially because AuthJWT is not using asymmetric encryption. Error was: {e}")
-            # Fallback to a default kid if public key is not available
-            reserved_claims["kid"] = "whoamikidding"
-            logger.debug("Defaulting kid claim")
+            logger.warning(f"Could not obtain kid for JOSE header. Potentially because AuthJWT is not using asymmetric encryption. Error was: {e}")
+            headers["kid"] = "whoamikidding"
+            logger.debug("Defaulting kid in JOSE header")
 
         algorithm = algorithm or self._algorithm
         logger.debug(f"Algorithm to be used: {algorithm}")
@@ -1236,6 +1236,12 @@ class AuthJWT(AuthConfig):
             if unverified_headers["alg"] not in (self._decode_algorithms or [self._algorithm]):
                 logger.error("Invalid algorithm from incoming header: %s", unverified_headers["alg"])
                 raise JWTDecodeError(status_code=422, message="Invalid algorithm on header")
+            # Validate kid in the JOSE header if configured (RFC 7515 §4.1)
+            if self._decode_kid is not None:
+                header_kid = unverified_headers.get("kid")
+                if header_kid != self._decode_kid:
+                    logger.error("kid mismatch: expected %s, got %s", self._decode_kid, header_kid)
+                    raise JWTDecodeError(status_code=422, message="Invalid kid on header")
             secret_key = self._get_secret_key(unverified_headers["alg"], "decode")
             logger.debug("secret_key: %s", secret_key)
         except KeyError as err:

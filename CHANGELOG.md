@@ -1,3 +1,8 @@
+## 0.23.0 (BREAKING)
+* **Breaking:** Move `kid` from JWT payload body to JOSE header per RFC 7515 §4.1. Consumers that previously read `kid` from decoded token claims must now read it from the JWT header (e.g., `jwt.get_unverified_header(token)["kid"]`).
+* Add `authjwt_decode_kid` config option for optional `kid` validation during token verification
+* Add test coverage for `kid` header placement and validation
+
 ## 0.22.8
 * Add "kid" claim to tokens when asymmetric encryption is used
 * Provide public key thumbprint to be used as "kid" claim by consumer programs

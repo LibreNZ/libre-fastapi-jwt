@@ -13,6 +13,7 @@ class AuthConfig():
     _private_key = None
     _algorithm = "HS256"
     _decode_algorithms = None
+    _decode_kid = None
     _decode_leeway = 0
     _encode_issuer = None
     _decode_issuer = None
@@ -70,6 +71,7 @@ class AuthConfig():
             cls._private_key = config.authjwt_private_key
             cls._algorithm = config.authjwt_algorithm
             cls._decode_algorithms = config.authjwt_decode_algorithms
+            cls._decode_kid = config.authjwt_decode_kid
             cls._decode_leeway = config.authjwt_decode_leeway
             cls._encode_issuer = config.authjwt_encode_issuer
             cls._decode_issuer = config.authjwt_decode_issuer

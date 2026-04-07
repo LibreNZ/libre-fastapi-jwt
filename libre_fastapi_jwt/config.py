@@ -17,6 +17,7 @@ class LoadConfig(BaseModel):
     authjwt_private_key: Optional[StrictStr] = None
     authjwt_algorithm: Optional[StrictStr] = "HS256"
     authjwt_decode_algorithms: Optional[List[StrictStr]] = None
+    authjwt_decode_kid: Optional[StrictStr] = None
     authjwt_decode_leeway: Optional[Union[StrictInt,timedelta]] = 0
     authjwt_encode_issuer: Optional[StrictStr] = None
     authjwt_decode_issuer: Optional[StrictStr] = None
