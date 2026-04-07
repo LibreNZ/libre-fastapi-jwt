@@ -38,12 +38,7 @@ pytest = ">=9.0.2"
 requests = ">=2.33.1"
 pytest-cov = ">=7.1.0"
 uvicorn = ">=0.44.0"
-[tool.poetry.group.dev.dependencies]
-pytest-md-report = ">=0.7.0"
-
 
 [tool.pytest.ini_options]
 log_format = "%(asctime)s loglevel=%(levelname)-6s logger=%(name)s %(funcName)s() L%(lineno)-4d %(message)s"
 log_date_format = "%Y-%m-%d %H:%M:%S"
-md_report = true
-md_report_color = "auto"
