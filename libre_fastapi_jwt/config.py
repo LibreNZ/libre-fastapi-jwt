@@ -69,14 +69,14 @@ class LoadConfig(BaseModel):
         if v is not None:
             if not all(item in ['access', 'refresh'] for item in v):
                 raise ValueError("Each item in 'authjwt_denylist_token_checks' must be either 'access' or 'refresh'")
-            return v
+        return v
 
     @field_validator('authjwt_token_location')
     def validate_token_location(cls, v):
         if v is not None:
             if not all(item in ['headers', 'cookies'] for item in v):
                 raise ValueError("Each item in 'authjwt_token_location' must be either 'headers' or 'cookies'")
-            return v
+        return v
 
     @field_validator('authjwt_cookie_samesite')
     def validate_cookie_samesite(cls, v):
@@ -90,9 +90,7 @@ class LoadConfig(BaseModel):
             if not all(method.upper() in {"GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"} for method in v):
                 raise ValueError("The 'authjwt_csrf_methods' must be between http request methods")
             return [method.upper() for method in v]
-        # if v.upper() not in {"GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"}:
-        #     raise ValueError("The 'authjwt_csrf_methods' must be between http request methods")
-        # return v.upper()
+        return v
 
     @field_validator('authjwt_token_type_claim_name')
     def validate_token_type_claim_name(cls, v):

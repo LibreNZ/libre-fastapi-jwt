@@ -32,6 +32,10 @@
 
 ---
 
+## Requirements
+
+Python 3.12, 3.13, or 3.14.
+
 ## Installation
 
 ```bash
@@ -43,6 +47,18 @@ For asymmetric (RSA/EC) key signing:
 ```bash
 pip install 'libre-fastapi-jwt[asymmetric]'
 ```
+
+## Dependencies
+
+| Package | Version | Role |
+|---|---|---|
+| [PyJWT](https://github.com/jpadilla/pyjwt) | `^2.10.1` | JWT encoding, decoding, and signature verification |
+| [FastAPI](https://github.com/fastapi/fastapi) | `>=0.115.8` | Web framework integration (`Depends`, `Request`, `Response`, `WebSocket`) |
+| [cryptography](https://github.com/pyca/cryptography) | `>=44.0.1` | RSA/EC key operations for asymmetric signing algorithms |
+| [httpx](https://github.com/encode/httpx) | `>=0.28.1` | Async HTTP client used to fetch JWKS endpoints |
+| [pydantic-settings](https://github.com/pydantic/pydantic-settings) | `^2.7.1` | Configuration loading and validation |
+
+All five packages are well-established, actively maintained, and widely used in the Python ecosystem. `cryptography` is the only one with compiled C extensions; the rest are pure Python.
 
 ---
 
@@ -216,7 +232,7 @@ Out of the box, libre-fastapi-jwt applies secure defaults so you don't have to t
 
 ---
 
-## More examples
+## Examples
 
 The [`examples/`](https://github.com/LibreNZ/libre-fastapi-jwt/tree/main/examples) directory covers:
 
@@ -226,6 +242,81 @@ The [`examples/`](https://github.com/LibreNZ/libre-fastapi-jwt/tree/main/example
 - [`freshness.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/examples/freshness.py) — fresh token requirements for sensitive actions
 - [`dual_token_location.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/examples/dual_token_location.py) — headers + cookies simultaneously
 - [`multiple_files/`](https://github.com/LibreNZ/libre-fastapi-jwt/tree/main/examples/multiple_files) — multi-file project structure
+
+---
+
+## Test coverage
+
+The test suite doubles as a functional specification. Each file below is a self-contained runnable guide for a specific area of the library.
+
+**[`tests/test_config.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_config.py)** — Configuration
+- Default values for all config options
+- Non-expiring tokens (`False` for expires)
+- Missing secret key raises `RuntimeError`
+- Denylist enabled without a callback raises an error
+- Full round-trip loading of all options from an external settings source
+
+**[`tests/test_create_token.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_create_token.py)** — Token creation
+- Parameter validation for access, refresh, and pair token creation
+- Dynamic expiry overrides per token
+- Audience, algorithm, and `user_claims` type checking
+- Custom claims are correctly embedded in the payload
+
+**[`tests/test_decode_token.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_decode_token.py)** — Token decoding & claims
+- Expiry, leeway, and decode error handling
+- Extracting raw token, JTI, and subject from requests
+- Issuer and audience validation (valid and invalid cases)
+- Algorithm mismatch detection
+- RS256 asymmetric signing — valid and invalid key scenarios
+
+**[`tests/test_headers.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_headers.py)** — Header-based auth
+- Missing JWT, missing Bearer prefix, malformed token
+- Valid `Authorization: Bearer <token>` flow
+- Custom claims embedded in JWT headers
+- Extracting JWT headers from request context
+- Custom header name and custom header type configuration
+
+**[`tests/test_cookies.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_cookies.py)** — Cookie-based auth & CSRF
+- Warning when cookies not in token location
+- CSRF cookies set/not-set based on configuration
+- Unsetting all cookies (access, refresh, CSRF)
+- Custom cookie key names
+- `jwt_optional` with CSRF variants
+- Full CSRF double-submit validation across multiple URL patterns
+
+**[`tests/test_token_types.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_token_types.py)** — Token type claims
+- Custom token type claim names
+- Custom access/refresh type values
+- Tokens operating without type claims entirely
+
+**[`tests/test_token_multiple_locations.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_token_multiple_locations.py)** — Dual token locations
+- Subject retrieval from either headers or cookies
+- Refresh via cookie
+- Token setting and unsetting across both locations
+
+**[`tests/test_denylist.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_denylist.py)** — Token revocation
+- Non-denylisted access and refresh tokens pass through
+- Denylisted access and refresh tokens are rejected
+
+**[`tests/test_websocket.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_websocket.py)** — WebSocket authentication
+- Missing token, wrong token type, valid access token
+- Optional JWT over WebSocket
+- Refresh-only and fresh-token-only endpoints
+- Invalid WebSocket instance type
+- Missing cookie, missing CSRF token, missing CSRF claim
+- CSRF double-submit mismatch and valid CSRF over WebSocket
+
+**[`tests/test_url_protected.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_url_protected.py)** — Protected endpoint enforcement
+- Missing header → 401
+- Refresh token rejected on access-only endpoint
+- `jwt_required`, `jwt_optional`, `jwt_refresh_token_required`, `fresh_jwt_required`
+
+**[`tests/test_kid.py`](https://github.com/LibreNZ/libre-fastapi-jwt/blob/main/tests/test_kid.py)** — Key ID (`kid`) & JWKS
+- `kid` placed in JOSE header (not body) for symmetric keys
+- `kid` is the public key thumbprint for asymmetric keys
+- Mismatched `kid` is rejected when validation is enabled
+- Matching `kid` is accepted
+- `kid` validation is opt-in (disabled by default)
 
 ---
 

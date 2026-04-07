@@ -14,10 +14,9 @@ classifiers = [
   "Environment :: Web Environment",
   "Intended Audience :: Developers",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
@@ -25,16 +24,16 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10.0,<4.0"
+python = ">=3.12.0,<4.0"
 PyJWT = "^2.10.1"
 fastapi = ">=0.115.8"
 cryptography = ">=44.0.1"
 httpx = ">=0.28.1"
 pydantic-settings = "^2.7.1"
-poetry-plugin-up = "^0.9.0"
 
 
 [tool.poetry.dev-dependencies]
+poetry-plugin-up = "^0.9.0"
 pytest = "^8.3.4"
 requests = ">=2.32.3"
 pytest-cov = "^6.0.0"
