@@ -79,23 +79,23 @@ def client():
         Authorize.unset_refresh_cookies()
 
     @app.post("/jwt-optional")
-    def jwt_optional(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_optional()
+    async def jwt_optional(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_optional()
         return {"hello": Authorize.get_jwt_subject()}
 
     @app.post("/jwt-required")
-    def jwt_required(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def jwt_required(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return {"hello": Authorize.get_jwt_subject()}
 
     @app.post("/jwt-refresh")
-    def jwt_refresh(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_refresh_token_required()
+    async def jwt_refresh(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_refresh_token_required()
         return {"hello": Authorize.get_jwt_subject()}
 
     @app.post("/jwt-fresh")
-    def jwt_fresh(Authorize: AuthJWT = Depends()):
-        Authorize.fresh_jwt_required()
+    async def jwt_fresh(Authorize: AuthJWT = Depends()):
+        await Authorize.fresh_jwt_required()
         return {"hello": Authorize.get_jwt_subject()}
 
     client = TestClient(app)

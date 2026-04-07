@@ -220,6 +220,37 @@ Full configuration options: [https://LibreNZ.github.io/libre-fastapi-jwt](https:
 
 ---
 
+## Async-native verification
+
+`jwt_required`, `jwt_optional`, `jwt_refresh_token_required`, and `fresh_jwt_required` are all `async` methods. This matters for denylist/revocation checks — the only place in a JWT library where real I/O (Redis, database) can occur. Token *creation* and cookie management remain synchronous since they involve no I/O.
+
+You must `await` these calls from your route handlers:
+
+```python
+@app.get("/protected")
+async def protected(Authorize: AuthJWT = Depends()):
+    await Authorize.jwt_required()
+    return {"hello": Authorize.get_jwt_subject()}
+```
+
+The denylist callback transparently supports both sync and async implementations:
+
+```python
+# Sync callback (e.g. in-memory set)
+@AuthJWT.token_in_denylist_loader
+def check_denylist(decoded_token: dict) -> bool:
+    return decoded_token["jti"] in revoked_jtis
+
+# Async callback (e.g. Redis)
+@AuthJWT.token_in_denylist_loader
+async def check_denylist(decoded_token: dict) -> bool:
+    return await redis.sismember("revoked_jtis", decoded_token["jti"])
+```
+
+Both forms work without any code changes on the caller side.
+
+---
+
 ## Security defaults
 
 Out of the box, libre-fastapi-jwt applies secure defaults so you don't have to think about them:

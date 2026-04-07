@@ -17,25 +17,25 @@ def client():
         )
 
     @app.get("/jwt-required")
-    def jwt_required(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def jwt_required(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return {"hello": "world"}
 
     @app.get("/jwt-optional")
-    def jwt_optional(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_optional()
+    async def jwt_optional(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_optional()
         if Authorize.get_jwt_subject():
             return {"hello": "world"}
         return {"hello": "anonym"}
 
     @app.get("/jwt-refresh-required")
-    def jwt_refresh_required(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_refresh_token_required()
+    async def jwt_refresh_required(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_refresh_token_required()
         return {"hello": "world"}
 
     @app.get("/fresh-jwt-required")
-    def fresh_jwt_required(Authorize: AuthJWT = Depends()):
-        Authorize.fresh_jwt_required()
+    async def fresh_jwt_required(Authorize: AuthJWT = Depends()):
+        await Authorize.fresh_jwt_required()
         return {"hello": "world"}
 
     client = TestClient(app)

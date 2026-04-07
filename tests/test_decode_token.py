@@ -18,23 +18,23 @@ def client():
         )
 
     @app.get("/protected")
-    def protected(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def protected(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return {"hello": "world"}
 
     @app.get("/raw_token")
-    def raw_token(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def raw_token(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return Authorize.get_raw_jwt()
 
     @app.get("/get_subject")
-    def get_subject(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def get_subject(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return Authorize.get_jwt_subject()
 
     @app.get("/refresh_token")
-    def get_refresh_token(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_refresh_token_required()
+    async def get_refresh_token(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_refresh_token_required()
         return Authorize.get_jwt_subject()
 
     client = TestClient(app)

@@ -12,18 +12,18 @@ def client() -> TestClient:
     app = FastAPI()
 
     @app.get("/protected")
-    def protected(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def protected(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return {"hello": "world"}
 
     @app.get("/semi_protected")
-    def protected(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_optional()
+    async def semi_protected(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_optional()
         return {"hello": "world"}
 
     @app.get("/refresh")
-    def refresher(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_refresh_token_required()
+    async def refresher(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_refresh_token_required()
         return {"hello": "world"}
 
     client = TestClient(app)

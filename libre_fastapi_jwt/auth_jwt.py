@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 # Get the logger instance
@@ -371,13 +372,16 @@ class AuthJWT(AuthConfig):
         """
         return self._token_in_denylist_callback is not None
 
-    def _check_token_is_revoked(
+    async def _check_token_is_revoked(
         self, raw_token: Dict[str, Union[str, int, bool]]
     ) -> None:
         """
         Ensure that AUTHJWT_DENYLIST_ENABLED is true and callback regulated, and then
         call function denylist callback with passing decode JWT, if true
-        raise exception Token has been revoked
+        raise exception Token has been revoked.
+
+        The callback may be either a plain function or a coroutine function —
+        both are supported transparently.
         """
         if not self._denylist_enabled:
             return
@@ -389,7 +393,13 @@ class AuthJWT(AuthConfig):
                 "authjwt_denylist_enabled is 'True'"
             )
 
-        if self._token_in_denylist_callback.__func__(raw_token):
+        callback = self._token_in_denylist_callback.__func__
+        if asyncio.iscoroutinefunction(callback):
+            is_revoked = await callback(raw_token)
+        else:
+            is_revoked = callback(raw_token)
+
+        if is_revoked:
             logger.error("Token has been revoked")
             raise RevokedTokenError(status_code=401, message="Token has been revoked")
 
@@ -875,7 +885,7 @@ class AuthJWT(AuthConfig):
                 samesite=self._cookie_samesite,
             )
 
-    def _verify_and_get_jwt_optional_in_cookies(
+    async def _verify_and_get_jwt_optional_in_cookies(
         self,
         request: Union[HTTPConnection, WebSocket],
         csrf_token: Optional[str] = None,
@@ -921,7 +931,7 @@ class AuthJWT(AuthConfig):
         self._token = cookie
         logger.debug("Token set from cookie")
 
-        self._verify_jwt_optional_in_request(self._token)
+        await self._verify_jwt_optional_in_request(self._token)
         logger.debug("JWT verified")
 
         decoded_token = self.get_raw_jwt()
@@ -944,7 +954,7 @@ class AuthJWT(AuthConfig):
 
         logger.debug("Finished optionally verifying and getting JWT from cookies")
 
-    def _verify_and_get_jwt_in_cookies(
+    async def _verify_and_get_jwt_in_cookies(
         self,
         type_token: str,
         request: Union[HTTPConnection, WebSocket],
@@ -1010,7 +1020,7 @@ class AuthJWT(AuthConfig):
         self._token = cookie
         logger.debug("Token set from cookie")
 
-        self._verify_jwt_in_request(self._token, type_token, "cookies", fresh)
+        await self._verify_jwt_in_request(self._token, type_token, "cookies", fresh)
         logger.debug("JWT verified")
 
         decoded_token = self.get_raw_jwt()
@@ -1033,7 +1043,7 @@ class AuthJWT(AuthConfig):
 
         logger.debug("Finished verifying and getting JWT from cookies.")
 
-    def _verify_jwt_optional_in_request(self, token: str) -> None:
+    async def _verify_jwt_optional_in_request(self, token: str) -> None:
         """
         Optionally check if this request has a valid access token
 
@@ -1043,7 +1053,7 @@ class AuthJWT(AuthConfig):
 
         if token:
             logger.debug("Token is present, verifying token")
-            self._verifying_token(token)
+            await self._verifying_token(token)
             logger.debug("Token verified")
 
             if self._token_type_claim:
@@ -1060,7 +1070,7 @@ class AuthJWT(AuthConfig):
 
         logger.debug("Finished verifying JWT optional in request")
 
-    def _verify_jwt_in_request(
+    async def _verify_jwt_in_request(
         self,
         token: str,
         type_token: str,
@@ -1109,7 +1119,7 @@ class AuthJWT(AuthConfig):
         # verify jwt
         issuer = self._decode_issuer if type_token == "access" else None
         logger.debug("Verifying token with issuer: %s", issuer)
-        self._verifying_token(token, issuer)
+        await self._verifying_token(token, issuer)
         raw_jwt = self.get_raw_jwt(token)
         logger.debug("Token claims retrieved")
 
@@ -1132,7 +1142,7 @@ class AuthJWT(AuthConfig):
 
         logger.debug("Finished verifying JWT in request")
 
-    def _verifying_token(
+    async def _verifying_token(
         self, encoded_token: str, issuer: Optional[str] = None
     ) -> None:
         """
@@ -1151,7 +1161,7 @@ class AuthJWT(AuthConfig):
             logger.debug("Token type claim is present")
             if raw_token[self._token_type_claim_name] in self._denylist_token_checks:
                 logger.debug("Token is in denylist, checking if revoked")
-                self._check_token_is_revoked(raw_token)
+                await self._check_token_is_revoked(raw_token)
 
         logger.debug("Verifying claims")
         self._verifying_claims(raw_token)
@@ -1249,7 +1259,7 @@ class AuthJWT(AuthConfig):
                 if claim not in raw_token or raw_token[claim] is None:
                     raise ClaimsRequired(status_code=422, message="Missing claim: team")
 
-    def jwt_required(
+    async def jwt_required(
         self,
         auth_from: str = "request",
         token: Optional[str] = None,
@@ -1273,31 +1283,31 @@ class AuthJWT(AuthConfig):
         if auth_from == "websocket":
             if websocket:
                 logger.debug("Verifying JWT in cookies for websocket")
-                self._verify_and_get_jwt_in_cookies("access", websocket, csrf_token)
+                await self._verify_and_get_jwt_in_cookies("access", websocket, csrf_token)
             else:
                 logger.debug("Verifying JWT in request for websocket")
-                self._verify_jwt_in_request(token, "access", "websocket")
+                await self._verify_jwt_in_request(token, "access", "websocket")
         if auth_from == "request":
             if len(self._token_location) == 2:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self._token and self.jwt_in_headers:
                     logger.debug("Verifying JWT from headers")
-                    self._verify_jwt_in_request(self._token, "access", "headers")
+                    await self._verify_jwt_in_request(self._token, "access", "headers")
                 if not self._token and self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT from cookies")
-                    self._verify_and_get_jwt_in_cookies("access", self._request)
+                    await self._verify_and_get_jwt_in_cookies("access", self._request)
             else:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self.jwt_in_headers:
                     logger.debug("Verifying JWT from headers")
-                    self._verify_jwt_in_request(self._token, "access", "headers")
+                    await self._verify_jwt_in_request(self._token, "access", "headers")
                 if self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT from cookies")
-                    self._verify_and_get_jwt_in_cookies("access", self._request)
+                    await self._verify_and_get_jwt_in_cookies("access", self._request)
 
         logger.debug("Finished eval protection for: JWT Required")
 
-    def jwt_optional(
+    async def jwt_optional(
         self,
         auth_from: str = "request",
         token: Optional[str] = None,
@@ -1327,31 +1337,31 @@ class AuthJWT(AuthConfig):
                 logger.debug(
                     "Verifying and getting optional JWT in cookies for websocket"
                 )
-                self._verify_and_get_jwt_optional_in_cookies(websocket, csrf_token)
+                await self._verify_and_get_jwt_optional_in_cookies(websocket, csrf_token)
             else:
                 logger.debug("Verifying optional JWT in request for websocket")
-                self._verify_jwt_optional_in_request(token)
+                await self._verify_jwt_optional_in_request(token)
         if auth_from == "request":
             if len(self._token_location) == 2:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self._token and self.jwt_in_headers:
                     logger.debug("Verifying optional JWT from headers")
-                    self._verify_jwt_optional_in_request(self._token)
+                    await self._verify_jwt_optional_in_request(self._token)
                 if not self._token and self.jwt_in_cookies:
                     logger.debug("Verifying and getting optional JWT from cookies")
-                    self._verify_and_get_jwt_optional_in_cookies(self._request)
+                    await self._verify_and_get_jwt_optional_in_cookies(self._request)
             else:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self.jwt_in_headers:
                     logger.debug("Verifying optional JWT from headers")
-                    self._verify_jwt_optional_in_request(self._token)
+                    await self._verify_jwt_optional_in_request(self._token)
                 if self.jwt_in_cookies:
                     logger.debug("Verifying and getting optional JWT from cookies")
-                    self._verify_and_get_jwt_optional_in_cookies(self._request)
+                    await self._verify_and_get_jwt_optional_in_cookies(self._request)
 
         logger.debug("Finished eval protection for: JWT Optional")
 
-    def jwt_refresh_token_required(
+    async def jwt_refresh_token_required(
         self,
         auth_from: str = "request",
         token: Optional[str] = None,
@@ -1376,31 +1386,31 @@ class AuthJWT(AuthConfig):
         if auth_from == "websocket":
             if websocket:
                 logger.debug("Verifying and getting JWT in cookies for websocket")
-                self._verify_and_get_jwt_in_cookies("refresh", websocket, csrf_token)
+                await self._verify_and_get_jwt_in_cookies("refresh", websocket, csrf_token)
             else:
                 logger.debug("Verifying JWT in request for websocket")
-                self._verify_jwt_in_request(token, "refresh", "websocket")
+                await self._verify_jwt_in_request(token, "refresh", "websocket")
         if auth_from == "request":
             if len(self._token_location) == 2:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self._token and self.jwt_in_headers:
                     logger.debug("Verifying JWT in headers")
-                    self._verify_jwt_in_request(self._token, "refresh", "headers")
+                    await self._verify_jwt_in_request(self._token, "refresh", "headers")
                 if not self._token and self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT in cookies")
-                    self._verify_and_get_jwt_in_cookies("refresh", self._request)
+                    await self._verify_and_get_jwt_in_cookies("refresh", self._request)
             else:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self.jwt_in_headers:
                     logger.debug("Verifying JWT in headers")
-                    self._verify_jwt_in_request(self._token, "refresh", "headers")
+                    await self._verify_jwt_in_request(self._token, "refresh", "headers")
                 if self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT in cookies")
-                    self._verify_and_get_jwt_in_cookies("refresh", self._request)
+                    await self._verify_and_get_jwt_in_cookies("refresh", self._request)
 
         logger.debug("Finished eval protection for: JWT Refresh Token Required")
 
-    def fresh_jwt_required(
+    async def fresh_jwt_required(
         self,
         auth_from: str = "request",
         token: Optional[str] = None,
@@ -1425,31 +1435,31 @@ class AuthJWT(AuthConfig):
         if auth_from == "websocket":
             if websocket:
                 logger.debug("Verifying and getting JWT in cookies for websocket")
-                self._verify_and_get_jwt_in_cookies(
+                await self._verify_and_get_jwt_in_cookies(
                     "access", websocket, csrf_token, True
                 )
             else:
                 logger.debug("Verifying JWT in request for websocket")
-                self._verify_jwt_in_request(token, "access", "websocket", True)
+                await self._verify_jwt_in_request(token, "access", "websocket", True)
         if auth_from == "request":
             if len(self._token_location) == 2:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self._token and self.jwt_in_headers:
                     logger.debug("Verifying JWT in headers")
-                    self._verify_jwt_in_request(self._token, "access", "headers", True)
+                    await self._verify_jwt_in_request(self._token, "access", "headers", True)
                 if not self._token and self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT in cookies")
-                    self._verify_and_get_jwt_in_cookies(
+                    await self._verify_and_get_jwt_in_cookies(
                         "access", self._request, fresh=True
                     )
             else:
                 logger.debug(f"Token location is: {self._token_location}")
                 if self.jwt_in_headers:
                     logger.debug("Verifying JWT in headers")
-                    self._verify_jwt_in_request(self._token, "access", "headers", True)
+                    await self._verify_jwt_in_request(self._token, "access", "headers", True)
                 if self.jwt_in_cookies:
                     logger.debug("Verifying and getting JWT in cookies")
-                    self._verify_and_get_jwt_in_cookies(
+                    await self._verify_and_get_jwt_in_cookies(
                         "access", self._request, fresh=True
                     )
 

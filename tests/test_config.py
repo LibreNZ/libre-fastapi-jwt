@@ -13,8 +13,8 @@ def client():
     app = FastAPI()
 
     @app.get("/protected")
-    def protected(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def protected(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
 
     client = TestClient(app)
     return client

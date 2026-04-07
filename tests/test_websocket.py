@@ -1,3 +1,4 @@
+import asyncio
 import pytest
 from libre_fastapi_jwt import AuthJWT
 from libre_fastapi_jwt.exceptions import AuthJWTException
@@ -36,7 +37,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_required("websocket", token=token)
+            await Authorize.jwt_required("websocket", token=token)
             await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
@@ -50,7 +51,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_required(
+            await Authorize.jwt_required(
                 "websocket", websocket=websocket, csrf_token=csrf_token
             )
             await websocket.send_text("Successful Login!")
@@ -64,7 +65,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_optional("websocket", token=token)
+            await Authorize.jwt_optional("websocket", token=token)
             decoded_token = Authorize.get_raw_jwt(token)
             if decoded_token:
                 await websocket.send_text("hello world")
@@ -81,7 +82,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_optional(
+            await Authorize.jwt_optional(
                 "websocket", websocket=websocket, csrf_token=csrf_token
             )
             decoded_token = Authorize.get_raw_jwt()
@@ -98,7 +99,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_refresh_token_required("websocket", token=token)
+            await Authorize.jwt_refresh_token_required("websocket", token=token)
             await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
@@ -112,7 +113,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.jwt_refresh_token_required(
+            await Authorize.jwt_refresh_token_required(
                 "websocket", websocket=websocket, csrf_token=csrf_token
             )
             await websocket.send_text("Successful Login!")
@@ -126,7 +127,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.fresh_jwt_required("websocket", token=token)
+            await Authorize.fresh_jwt_required("websocket", token=token)
             await websocket.send_text("Successful Login!")
         except AuthJWTException as err:
             await websocket.send_text(err.message)
@@ -140,7 +141,7 @@ def client():
     ):
         await websocket.accept()
         try:
-            Authorize.fresh_jwt_required(
+            await Authorize.fresh_jwt_required(
                 "websocket", websocket=websocket, csrf_token=csrf_token
             )
             await websocket.send_text("Successful Login!")
@@ -225,13 +226,13 @@ def test_fresh_jwt_required_websocket(client, Authorize):
 
 def test_invalid_instance_websocket(Authorize):
     with pytest.raises(TypeError, match=r"request"):
-        Authorize.jwt_required("websocket", websocket="test")
+        asyncio.run(Authorize.jwt_required("websocket", websocket="test"))
     with pytest.raises(TypeError, match=r"request"):
-        Authorize.jwt_optional("websocket", websocket="test")
+        asyncio.run(Authorize.jwt_optional("websocket", websocket="test"))
     with pytest.raises(TypeError, match=r"request"):
-        Authorize.jwt_refresh_token_required("websocket", websocket="test")
+        asyncio.run(Authorize.jwt_refresh_token_required("websocket", websocket="test"))
     with pytest.raises(TypeError, match=r"request"):
-        Authorize.fresh_jwt_required("websocket", websocket="test")
+        asyncio.run(Authorize.fresh_jwt_required("websocket", websocket="test"))
 
 
 @pytest.mark.parametrize(

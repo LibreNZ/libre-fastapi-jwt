@@ -19,18 +19,18 @@ def client():
         )
 
     @app.get("/protected")
-    def protected(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def protected(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return {"hello": "world"}
 
     @app.get("/get_headers_access")
-    def get_headers_access(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_required()
+    async def get_headers_access(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_required()
         return Authorize.get_unverified_jwt_headers()
 
     @app.get("/get_headers_refresh")
-    def get_headers_refresh(Authorize: AuthJWT = Depends()):
-        Authorize.jwt_refresh_token_required()
+    async def get_headers_refresh(Authorize: AuthJWT = Depends()):
+        await Authorize.jwt_refresh_token_required()
         return Authorize.get_unverified_jwt_headers()
 
     client = TestClient(app)
