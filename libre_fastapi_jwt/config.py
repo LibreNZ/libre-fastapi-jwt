@@ -53,18 +53,21 @@ class LoadConfig(BaseModel):
     authjwt_token_type_claim_name: Optional[StrictStr] = "type"
 
     @field_validator('authjwt_access_token_expires')
+    @classmethod
     def validate_access_token_expires(cls, v):
         if v is True:
             raise ValueError("The 'authjwt_access_token_expires' only accept value False (bool)")
         return v
 
     @field_validator('authjwt_refresh_token_expires')
+    @classmethod
     def validate_refresh_token_expires(cls, v):
         if v is True:
             raise ValueError("The 'authjwt_refresh_token_expires' only accept value False (bool)")
         return v
 
     @field_validator('authjwt_denylist_token_checks')
+    @classmethod
     def validate_denylist_token_checks(cls, v):
         if v is not None:
             if not all(item in ['access', 'refresh'] for item in v):
@@ -72,6 +75,7 @@ class LoadConfig(BaseModel):
         return v
 
     @field_validator('authjwt_token_location')
+    @classmethod
     def validate_token_location(cls, v):
         if v is not None:
             if not all(item in ['headers', 'cookies'] for item in v):
@@ -79,12 +83,14 @@ class LoadConfig(BaseModel):
         return v
 
     @field_validator('authjwt_cookie_samesite')
+    @classmethod
     def validate_cookie_samesite(cls, v):
         if v not in ['strict','lax','none']:
             raise ValueError("The 'authjwt_cookie_samesite' must be between 'strict', 'lax', 'none'")
         return v
 
     @field_validator('authjwt_csrf_methods')
+    @classmethod
     def validate_csrf_methods(cls, v):
         if v is not None:
             if not all(method.upper() in {"GET", "HEAD", "POST", "PUT", "DELETE", "PATCH"} for method in v):
@@ -93,6 +99,7 @@ class LoadConfig(BaseModel):
         return v
 
     @field_validator('authjwt_token_type_claim_name')
+    @classmethod
     def validate_token_type_claim_name(cls, v):
         if v.lower() in {'iss', 'sub', 'aud', 'exp', 'nbf', 'iat', 'jti'}:
             raise ValueError("The 'authjwt_token_type_claim_name' can not override default JWT claims")

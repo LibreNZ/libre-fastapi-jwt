@@ -1,7 +1,7 @@
 import pytest
 import logging
 from libre_fastapi_jwt import AuthJWT
-from fastapi import FastAPI, Depends, Request # type: ignore
+from fastapi import FastAPI, Depends # type: ignore
 from fastapi.testclient import TestClient # type: ignore
 
 logging.basicConfig(level=logging.DEBUG)
@@ -31,20 +31,9 @@ def client():
         return {"hello": Authorize.get_jwt_subject()}
 
     @app.post("/jwt-refresh")
-    async def jwt_refresh(request: Request, Authorize: AuthJWT = Depends()):
-        # Extract request headers and body
-        request_headers = dict(request.headers)
-        request_body = await request.body()
-
-        # Log the request details
-        logging.debug(f"Request Headers: {request_headers}")
-
-        # Perform the JWT refresh token check
+    async def jwt_refresh(Authorize: AuthJWT = Depends()):
         Authorize.jwt_refresh_token_required()
-        response_body = {"hello": Authorize.get_jwt_subject()}
-
-        # Return all the information
-        return response_body
+        return {"hello": Authorize.get_jwt_subject()}
 
     @app.post("/jwt-fresh")
     def jwt_fresh(Authorize: AuthJWT = Depends()):

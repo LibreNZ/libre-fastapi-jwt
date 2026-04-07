@@ -324,19 +324,14 @@ class AuthJWT(AuthConfig):
         # if cookie in token location and csrf protection enabled
         if self.jwt_in_cookies and self._cookie_csrf_protect:
             custom_claims["csrf"] = self._get_jwt_identifier()
-        logger.debug(f"Custom claims after CSRF check: {custom_claims}")
-
         if exp_time:
             reserved_claims["exp"] = exp_time
-        logger.debug(f"Reserved claims after exp_time check: {reserved_claims}")
 
         if issuer:
             reserved_claims["iss"] = issuer
-        logger.debug(f"Reserved claims after issuer check: {reserved_claims}")
 
         if audience:
             reserved_claims["aud"] = audience
-        logger.debug(f"Reserved claims after audience check: {reserved_claims}")
 
         # Add kid to JOSE header per RFC 7515 §4.1
         if headers is None:
@@ -344,9 +339,9 @@ class AuthJWT(AuthConfig):
         try:
             _, thumbprint = self.get_public_key()
             headers["kid"] = thumbprint
-            logger.debug(f"Added kid to JOSE header from public key thumbprint: {thumbprint}")
-        except RuntimeError as e:
-            logger.warning(f"Could not obtain kid for JOSE header. Potentially because AuthJWT is not using asymmetric encryption. Error was: {e}")
+            logger.debug("Added kid to JOSE header from public key thumbprint")
+        except RuntimeError:
+            logger.warning("Could not obtain kid for JOSE header; not using asymmetric encryption")
             headers["kid"] = "whoamikidding"
             logger.debug("Defaulting kid in JOSE header")
 
@@ -895,8 +890,6 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token
         """
         logger.debug("Optionally verify and get JWT from cookies")
-        logger.debug("request: %s", request)
-        logger.debug("csrf_token: %s", csrf_token)
 
         if not isinstance(request, (HTTPConnection, WebSocket)):
             logger.error(
@@ -914,7 +907,7 @@ class AuthJWT(AuthConfig):
 
         if not isinstance(request, WebSocket):
             csrf_token = request.headers.get(self._access_csrf_header_name)
-            logger.debug("csrf_token from headers: %s", csrf_token)
+            logger.debug("CSRF token present: %s", csrf_token is not None)
 
         if cookie and self._cookie_csrf_protect and not csrf_token:
             if (
@@ -969,17 +962,7 @@ class AuthJWT(AuthConfig):
         :param csrf_token: the CSRF double submit token
         :param fresh: check freshness token if True
         """
-        logger.debug("Verify and get JWT from cookies")
-        logger.debug("type_token: %s", type_token)
-        # Check if request is a valid object with headers
-        if hasattr(request, 'headers'):
-            request_headers = dict(request.headers)
-            logger.debug("Request Headers: %s", request_headers)
-        else:
-            request_headers = None  # or handle it as needed
-            logger.debug("No Request Headers.")
-        logger.debug("csrf_token: %s", csrf_token)
-        logger.debug("fresh: %s", fresh)
+        logger.debug("Verify and get JWT from cookies, type=%s, fresh=%s", type_token, fresh)
 
         # Validate input
         if type_token not in ["access", "refresh"]:
@@ -993,24 +976,14 @@ class AuthJWT(AuthConfig):
                 "request must be an instance of 'HTTPConnection' or 'WebSocket'"
             )
 
-        # Initialize cookie_key with a default value
-        cookie_key = None
-
         # Get token type and CSRF token, set cookie_key. If request does NOT come from WebSocket, grab the CSRF value from the header.
-        logger.debug(f"Token type is: {type_token}")
         if type_token == "access":
-            logger.debug("Setting cookie_key to '_access_cookie_key'")
             cookie_key = self._access_cookie_key
             if not isinstance(request, WebSocket):
-                logger.debug(f"Setting csrf_token to {self._access_csrf_header_name}")
                 csrf_token = request.headers.get(self._access_csrf_header_name)
-        if type_token == "refresh":
-            logger.debug(f"Setting cookie_key to {self._refresh_cookie_key}")
+        else:  # "refresh", already validated above
             cookie_key = self._refresh_cookie_key
             if not isinstance(request, WebSocket):
-                logger.debug(
-                    "Setting csrf_token to 'request.headers.get(self._refresh_csrf_header_name)'"
-                )
                 csrf_token = request.headers.get(self._refresh_csrf_header_name)
 
         logger.debug(f"cookie_key: {cookie_key}")
@@ -1204,32 +1177,32 @@ class AuthJWT(AuthConfig):
         logger.debug("algorithms: %s", algorithms)
 
         try:
-            logger.debug("Calling 'get_unverified_jwt_headers()' to obtain only the headers from the JWT...")
+            logger.debug("Parsing unverified JWT headers")
             unverified_headers = self.get_unverified_jwt_headers(encoded_token)
-            logger.debug("unverified_headers: %s", unverified_headers)
+            logger.debug("Unverified headers parsed")
         except Exception as err:
-            logger.error("Invalid header error: %s", err)
+            logger.error("Invalid JWT header structure")
             raise InvalidHeaderError(status_code=422, message=str(err))
 
         try:
-            logger.debug("Calling '_get_secret_key()' to decode the JWT...")
+            logger.debug("Selecting secret key for token verification")
             # Validate the algorithm in the header
             if unverified_headers["alg"] not in (self._decode_algorithms or [self._algorithm]):
-                logger.error("Invalid algorithm from incoming header: %s", unverified_headers["alg"])
+                logger.error("Invalid algorithm in incoming token header")
                 raise JWTDecodeError(status_code=422, message="Invalid algorithm on header")
             # Validate kid in the JOSE header if configured (RFC 7515 §4.1)
             if self._decode_kid is not None:
                 header_kid = unverified_headers.get("kid")
                 if header_kid != self._decode_kid:
-                    logger.error("kid mismatch: expected %s, got %s", self._decode_kid, header_kid)
+                    logger.error("kid mismatch in token header")
                     raise JWTDecodeError(status_code=422, message="Invalid kid on header")
             secret_key = self._get_secret_key(unverified_headers["alg"], "decode")
-            logger.debug("Secret key retrieved for algorithm: %s", unverified_headers["alg"])
-        except KeyError as err:
-            logger.error("Missing 'alg' header in JWT: %s", err)
+            logger.debug("Secret key selected")
+        except KeyError:
+            logger.error("Missing 'alg' header in JWT")
             raise JWTDecodeError(status_code=422, message="Missing 'alg' header")
         except Exception as err:
-            logger.error("Error getting secret key: %s", err)
+            logger.error("Error selecting secret key: %s", type(err).__name__)
             raise
 
         try:
@@ -1245,10 +1218,10 @@ class AuthJWT(AuthConfig):
             logger.debug("Token decoded successfully")
             return decoded_token
         except ExpiredSignatureError as err:
-            logger.error("Expired signature error: %s", err)
+            logger.error("Token signature expired")
             raise JWTDecodeError(status_code=401, message=str(err))
         except Exception as err:
-            logger.error("JWT decode error: %s", err)
+            logger.error("JWT decode error: %s", type(err).__name__)
             raise JWTDecodeError(status_code=422, message=str(err))
 
     def _verifying_roles(self, raw_token: dict) -> None:
@@ -1529,7 +1502,7 @@ class AuthJWT(AuthConfig):
         :return: JWT header parameters as a dictionary
         """
         encoded_token = encoded_token or self._token
-        logger.debug("Getting the headers from the token: %s", encoded_token)
+        logger.debug("Getting unverified JWT headers")
 
         return jwt.get_unverified_header(encoded_token)
 
